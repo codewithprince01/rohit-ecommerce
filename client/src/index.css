@@ -1,0 +1,315 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
+
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-display: 'Outfit', 'Inter', sans-serif;
+  
+  /* Premium Light Green / Sage Palette */
+  --color-primary-50: #f2fcf5;
+  --color-primary-100: #e1f7e7;
+  --color-primary-200: #c5edd1;
+  --color-primary-300: #93ddb2;
+  --color-primary-400: #58c58f;
+  --color-primary-500: #2fab73; /* Main Brand Color */
+  --color-primary-600: #208a5a;
+  --color-primary-700: #1a6e49;
+  --color-primary-800: #17573c;
+  --color-primary-900: #144833;
+  
+  /* Unified Light Theme (No Secondary Red/Orange) */
+  --color-secondary-50: #f2fcf5;
+  --color-secondary-100: #e1f7e7;
+  --color-secondary-200: #c5edd1;
+  --color-secondary-300: #93ddb2;
+  --color-secondary-400: #58c58f;
+  --color-secondary-500: #2fab73;
+  --color-secondary-600: #208a5a;
+  --color-secondary-700: #1a6e49;
+  --color-secondary-800: #17573c;
+  --color-secondary-900: #144833;
+  
+  /* Accents (Subtle Gold/Yellow for offers) */
+  --color-accent-50: #fffbeb;
+  --color-accent-100: #fef3c7;
+  --color-accent-200: #fde68a;
+  --color-accent-300: #fcd34d;
+  --color-accent-400: #fbbf24;
+  --color-accent-500: #f59e0b;
+  --color-accent-600: #d97706;
+  --color-accent-700: #b45309;
+  --color-accent-800: #92400e;
+  --color-accent-900: #78350f;
+
+  /* Custom Shadows */
+  --shadow-soft: 0 10px 40px -10px rgba(47, 171, 115, 0.08); 
+  --shadow-card: 0 4px 12px -2px rgba(0, 0, 0, 0.05);
+  --shadow-card-hover: 0 20px 40px -5px rgba(47, 171, 115, 0.15);
+  --shadow-glow: 0 0 20px rgba(47, 171, 115, 0.25);
+  --shadow-glow-lg: 0 0 30px rgba(47, 171, 115, 0.4);
+  --shadow-inner-soft: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+
+  /* Custom Background Images */
+  --background-image-shimmer: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  
+  /* Custom Animations */
+  --animate-fade-in: fadeIn 0.5s ease-in-out;
+  --animate-fade-in-up: fadeInUp 0.6s ease-out;
+  --animate-fade-in-down: fadeInDown 0.6s ease-out;
+  --animate-slide-in-right: slideInRight 0.5s ease-out;
+  --animate-slide-in-left: slideInLeft 0.5s ease-out;
+  --animate-bounce-slow: bounce 3s infinite;
+  --animate-pulse-slow: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-spin-slow: spin 3s linear infinite;
+  --animate-wiggle: wiggle 1s ease-in-out infinite;
+  --animate-shimmer: shimmer 2s linear infinite;
+  --animate-float: float 3s ease-in-out infinite;
+}
+
+/* Custom Keyframes */
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+@keyframes fadeInUp {
+  0% { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeInDown {
+  0% { opacity: 0; transform: translateY(-20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideInRight {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(0); }
+}
+@keyframes slideInLeft {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(0); }
+}
+@keyframes wiggle {
+  0%, 100% { transform: rotate(-3deg); }
+  50% { transform: rotate(3deg); }
+}
+@keyframes shimmer {
+  0% { background-position: -1000px 0; }
+  100% { background-position: 1000px 0; }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+}
+
+@layer base {
+  body {
+    @apply bg-gray-50 text-gray-900 font-sans antialiased;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display font-bold;
+  }
+}
+
+@layer components {
+  /* Button Styles */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full font-medium transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95;
+  }
+
+  .btn-primary {
+    @apply bg-primary-500 text-white shadow-lg shadow-primary-500/20 hover:bg-primary-600 hover:shadow-primary-500/30 hover:-translate-y-0.5;
+  }
+
+  .btn-secondary {
+    @apply bg-white text-gray-900 border border-gray-200 hover:border-primary-500 hover:text-primary-600 hover:bg-primary-50;
+  }
+
+  .btn-outline {
+    @apply border-2 border-primary-500 text-primary-600 bg-transparent hover:bg-primary-500 hover:text-white hover:shadow-lg;
+  }
+
+  .btn-ghost {
+    @apply text-gray-600 hover:text-primary-600 hover:bg-primary-50/50 rounded-lg;
+  }
+
+  .btn-sm {
+    @apply px-4 py-2 text-sm;
+  }
+
+  .btn-lg {
+    @apply px-8 py-4 text-lg;
+  }
+
+  /* Card Styles */
+  .card {
+    @apply bg-white rounded-3xl border border-gray-100/50 shadow-card transition-all duration-500 overflow-hidden;
+  }
+
+  .card-hover {
+    @apply hover:shadow-card-hover hover:border-primary-100 hover:-translate-y-1;
+  }
+
+  /* Input Styles */
+  .input {
+    @apply w-full px-5 py-3.5 bg-gray-50 border border-transparent rounded-2xl text-gray-900 placeholder-gray-400 focus:bg-white focus:border-primary-200 focus:ring-4 focus:ring-primary-500/10 transition-all duration-300 outline-none;
+  }
+
+  .input-error {
+    @apply border-red-500 focus:ring-red-500/10;
+  }
+
+  /* Badge Styles */
+  .badge {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-medium tracking-wide;
+  }
+
+  .badge-success {
+    @apply bg-primary-100 text-primary-700;
+  }
+
+  .badge-warning {
+    @apply bg-accent-100 text-accent-700;
+  }
+
+  .badge-error {
+    @apply bg-red-50 text-red-600;
+  }
+
+  .badge-info {
+    @apply bg-blue-50 text-blue-600;
+  }
+
+  /* Container */
+  .container-custom {
+    @apply max-w-7xl mx-auto px-6 sm:px-8;
+  }
+
+  /* Gradient Text */
+  .gradient-text {
+    @apply bg-gradient-to-r from-primary-600 to-primary-400 bg-clip-text text-transparent;
+  }
+
+  /* Glass Effect */
+  .glass {
+    @apply bg-white/70 backdrop-blur-xl border border-white/40 shadow-sm;
+  }
+
+  /* Loading Skeleton */
+  .skeleton {
+    @apply animate-pulse bg-gray-100 rounded-2xl;
+  }
+
+  /* Scrollbar Styles */
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    @apply bg-gray-100 rounded;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    @apply bg-gray-400 rounded hover:bg-gray-500;
+  }
+
+  /* Product Grid */
+  .product-grid {
+    @apply grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6;
+  }
+
+  /* Category Grid */
+  .category-grid {
+    @apply grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4;
+  }
+
+  /* Floating WhatsApp Button */
+  .whatsapp-float {
+    @apply fixed bottom-6 right-6 z-50 bg-green-500 text-white p-4 rounded-full shadow-glow-lg hover:shadow-glow hover:scale-110 transition-all duration-300 animate-float;
+  }
+
+  /* Breadcrumb */
+  .breadcrumb {
+    @apply flex items-center gap-2 text-sm text-gray-600;
+  }
+
+  .breadcrumb-item {
+    @apply hover:text-primary-600 transition-colors;
+  }
+
+  .breadcrumb-separator {
+    @apply text-gray-400;
+  }
+
+  /* Price Display */
+  .price {
+    @apply text-2xl font-bold text-primary-600;
+  }
+
+  .price-old {
+    @apply text-lg text-gray-400 line-through;
+  }
+
+  /* Section Heading */
+  .section-heading {
+    @apply text-3xl md:text-4xl font-display font-bold text-gray-900 mb-8;
+  }
+
+  /* Shimmer Effect */
+  .shimmer-effect {
+    @apply relative overflow-hidden;
+  }
+
+  .shimmer-effect::after {
+    content: '';
+    @apply absolute inset-0 bg-shimmer animate-shimmer;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .animation-delay-200 {
+    animation-delay: 200ms;
+  }
+
+  .animation-delay-400 {
+    animation-delay: 400ms;
+  }
+
+  .animation-delay-600 {
+    animation-delay: 600ms;
+  }
+}
+
+/* Custom Scrollbar for entire page */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Print Styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}
