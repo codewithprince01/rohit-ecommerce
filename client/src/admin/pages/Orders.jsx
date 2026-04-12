@@ -16,7 +16,8 @@ import {
   XCircle,
   ArrowRight,
 } from "lucide-react";
-import api from "../../utils/api";
+import { getImageUrl } from "../../services/api";
+import api from "../../services/api";
 import {
   StatusBadge,
   DataTable,
@@ -209,9 +210,9 @@ const OrderDetailModal = ({ order, isOpen, onClose, onUpdateStatus }) => {
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 bg-gray-100 rounded-lg overflow-hidden">
-                          {item.image ? (
+                          {getImageUrl(item.image) ? (
                             <img
-                              src={item.image}
+                              src={getImageUrl(item.image)}
                               alt={item.name}
                               className="w-full h-full object-cover"
                             />

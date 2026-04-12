@@ -15,7 +15,8 @@ import {
   ChevronDown,
   X,
 } from "lucide-react";
-import api from "../../utils/api";
+import { getImageUrl } from "../../services/api";
+import api from "../../services/api";
 import {
   StatusBadge,
   DataTable,
@@ -138,16 +139,9 @@ const Products = () => {
       render: (product) => (
         <div className="flex items-center gap-4">
           <div className="w-14 h-14 bg-gray-100 dark:bg-gray-700 rounded-xl overflow-hidden flex-shrink-0">
-            {product.images?.[0]?.url ||
-            product.thumbnail ||
-            product.images?.[0] ? (
+            {getImageUrl(product.images?.[0] || product.thumbnail) ? (
               <img
-                src={(() => {
-                  const img = product.images?.[0]?.url || product.thumbnail || product.images?.[0];
-                  if (!img) return '';
-                  if (typeof img === 'string' && img.startsWith('http')) return img;
-                  return `${import.meta.env.VITE_API_URL.replace('/api', '')}/${typeof img === 'string' ? img : img.url}`;
-                })()}
+                src={getImageUrl(product.images?.[0] || product.thumbnail)}
                 alt={product.name}
                 className="w-full h-full object-cover"
               />

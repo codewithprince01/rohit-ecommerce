@@ -62,5 +62,25 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+// Helper to get full image URL
+export const getImageUrl = (image) => {
+    if (!image) return null;
+    
+    // If it's an object with a URL property (from some legacy logic)
+    const imgSource = typeof image === 'object' ? image.url : image;
+    
+    if (!imgSource) return null;
+    
+    // If it's already a full URL
+    if (imgSource.startsWith('http')) return imgSource;
+    
+    // Clean up paths that start with / (prevent double slashes)
+    const cleanPath = imgSource.startsWith('/') ? imgSource.slice(1) : imgSource;
+    
+    // Get base URL from environment (e.g., http://localhost:5000)
+    const baseUrl = (import.meta.env.VITE_API_URL || '').replace('/api', '');
+    
+    return `${baseUrl}/${cleanPath}`;
+};
 
 export default api;
