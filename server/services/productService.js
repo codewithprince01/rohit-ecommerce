@@ -37,11 +37,11 @@ class ProductService {
     if (subcategory) query.subcategory = subcategory;
     if (subSubCategory) query.subSubCategory = subSubCategory;
 
-    // Price range filter
+    // Price range filter (apply to selling price)
     if (minPrice || maxPrice) {
-      query.price = {};
-      if (minPrice) query.price.$gte = parseFloat(minPrice);
-      if (maxPrice) query.price.$lte = parseFloat(maxPrice);
+      query['pricing.sellingPrice'] = {};
+      if (minPrice) query['pricing.sellingPrice'].$gte = parseFloat(minPrice);
+      if (maxPrice) query['pricing.sellingPrice'].$lte = parseFloat(maxPrice);
     }
 
     // Stock filter
@@ -109,7 +109,7 @@ class ProductService {
       inStock: true
     })
       .limit(limit)
-      .select('name slug price unit images')
+      .select('name slug pricing.sellingPrice unit images')
       .lean();
 
     return products;
@@ -126,7 +126,7 @@ class ProductService {
     })
       .limit(limit)
       .populate('category', 'name slug')
-      .select('name slug price comparePrice unit images')
+      .select('name slug pricing.sellingPrice pricing.mrp unit images')
       .lean();
 
     return products;
@@ -148,7 +148,7 @@ class ProductService {
 
     const product = await Product.create({
       ...productData,
-      images: imagePaths
+      images: imagePaths.map(p => ({ url: p }))
     });
 
     return await product.populate([
@@ -176,7 +176,9 @@ class ProductService {
       );
       
       // Add new images to existing ones
-      productData.images = [...(product.images || []), ...newImagePaths];
+      // existing images may be objects - keep structure
+      const existing = (product.images || []).map(img => img.url ? img.url : img);
+      productData.images = [...existing, ...newImagePaths].map(p => ({ url: p }));
     }
 
     // Update product
@@ -200,7 +202,7 @@ class ProductService {
     }
 
     // Remove image from product
-    product.images = product.images.filter(img => img !== imagePath);
+    product.images = product.images.filter(img => img.url !== imagePath && img !== imagePath);
     await product.save();
 
     // Delete physical file
@@ -220,7 +222,8 @@ class ProductService {
 
     // Delete all product images
     if (product.images && product.images.length > 0) {
-      await imageService.deleteFiles(product.images);
+      // pass list of urls
+      await imageService.deleteFiles(product.images.map(img => img.url || img));
     }
 
     await product.deleteOne();

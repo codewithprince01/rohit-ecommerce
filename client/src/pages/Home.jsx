@@ -81,15 +81,20 @@ const Home = () => {
             {(categories || []).map((category) => (
               <Link
                 key={category._id}
-                to={`/products?category=${category._id}`}
+                to={`/category/${category.slug}`}
                 className="card hover:shadow-lg transition-shadow duration-200 p-6 text-center"
               >
                 {category.image && (
-                  <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-primary-100 flex items-center justify-center">
+                  <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-primary-100 flex items-center justify-center overflow-hidden">
                     <img
-                      src={`http://localhost:5000${category.image}`}
+                      src={category.image 
+                        ? (category.image.startsWith('http') 
+                            ? category.image 
+                            : `${import.meta.env.VITE_API_URL.replace('/api', '')}/${category.image}`)
+                        : `https://via.placeholder.com/400x400?text=${encodeURIComponent(category.name)}`
+                      }
                       alt={category.name}
-                      className="w-12 h-12 object-contain"
+                      className="w-full h-full object-cover"
                     />
                   </div>
                 )}

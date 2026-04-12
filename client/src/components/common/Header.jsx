@@ -137,7 +137,10 @@ const Header = () => {
                                          >
                                             <div className="w-10 h-10 rounded-lg bg-white p-1 shadow-sm border border-gray-100 flex items-center justify-center overflow-hidden shrink-0">
                                                 <img 
-                                                    src={product.images?.[0] ? `${import.meta.env.VITE_API_URL.replace('/api', '')}${product.images[0]}` : 'https://via.placeholder.com/50'} 
+                                                    src={product.images?.[0] 
+                                                        ? `${import.meta.env.VITE_API_URL.replace('/api', '')}/${(typeof product.images[0] === 'string' ? product.images[0] : product.images[0].url).startsWith('/') ? (typeof product.images[0] === 'string' ? product.images[0].substring(1) : product.images[0].url.substring(1)) : (typeof product.images[0] === 'string' ? product.images[0] : product.images[0].url)}` 
+                                                        : 'https://dummyimage.com/50x50/f3f4f6/9ca3af.png&text=Product'
+                                                    } 
                                                     alt={product.name} 
                                                     className="w-full h-full object-contain"
                                                 />

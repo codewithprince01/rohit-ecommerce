@@ -39,7 +39,7 @@ const ProductList = () => {
   useEffect(() => {
     const fetchCats = async () => {
       try {
-        const res = await categoryService.getAll();
+        const res = await categoryService.getHierarchy();
         setCategories(res.data);
       } catch (err) {
         console.error(err);
@@ -163,32 +163,52 @@ const ProductList = () => {
                 )}
               </h3>
               <div className="space-y-2 max-h-60 overflow-y-auto custom-scrollbar pr-2">
-                {(categories || []).map((cat) => (
-                  <label
-                    key={cat._id}
-                    className="flex items-center gap-3 cursor-pointer group"
-                  >
-                    <div
-                      className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${filters.category === cat._id ? "bg-primary-600 border-primary-600" : "border-gray-300 group-hover:border-primary-500"}`}
-                    >
-                      {filters.category === cat._id && (
-                        <div className="w-2 h-2 bg-white rounded-full" />
-                      )}
-                    </div>
-                    <input
-                      type="radio"
-                      name="category"
-                      className="hidden"
-                      checked={filters.category === cat._id}
-                      onChange={() => handleFilterChange("category", cat._id)}
-                    />
-                    <span
-                      className={`text-sm ${filters.category === cat._id ? "text-primary-700 font-medium" : "text-gray-600 group-hover:text-gray-900"}`}
-                    >
-                      {cat.name}
-                    </span>
-                  </label>
-                ))}
+                {(() => {
+                  const renderCats = (cats, level = 0) => {
+                    return (cats || []).map((cat) => (
+                      <div key={cat._id} className="w-full">
+                        <label className="flex items-center gap-2 cursor-pointer group">
+                          <div
+                            style={{ marginLeft: `${level * 12}px` }}
+                            className={`flex-shrink-0 w-4 h-4 rounded border flex items-center justify-center transition-colors ${
+                              filters.category === cat._id
+                                ? "bg-primary-600 border-primary-600"
+                                : "border-gray-300 group-hover:border-primary-500"
+                            }`}
+                          >
+                            {filters.category === cat._id && (
+                              <div className="w-2 h-2 bg-white rounded-full" />
+                            )}
+                          </div>
+                          <input
+                            type="radio"
+                            name="category"
+                            className="hidden"
+                            checked={filters.category === cat._id}
+                            onChange={() =>
+                              handleFilterChange("category", cat._id)
+                            }
+                          />
+                          <span
+                            className={`text-sm truncate ${
+                              filters.category === cat._id
+                                ? "text-primary-700 font-semibold"
+                                : "text-gray-600 group-hover:text-gray-900"
+                            }`}
+                          >
+                            {cat.name}
+                          </span>
+                        </label>
+                        {cat.children && cat.children.length > 0 && (
+                          <div className="mt-1">
+                            {renderCats(cat.children, level + 1)}
+                          </div>
+                        )}
+                      </div>
+                    ));
+                  };
+                  return renderCats(categories);
+                })()}
               </div>
             </div>
 

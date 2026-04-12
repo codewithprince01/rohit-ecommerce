@@ -121,16 +121,6 @@ const productSchema = new mongoose.Schema({
     ref: 'Category',
     required: [true, 'Category is required']
   },
-  subcategory: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Subcategory',
-    default: null
-  },
-  subSubCategory: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'SubSubCategory',
-    default: null
-  },
   brand: {
     type: String,
     trim: true
@@ -359,8 +349,25 @@ const productSchema = new mongoose.Schema({
   }
 }, {
   timestamps: true,
-  toJSON: { virtuals: true },
+  toJSON: { 
+    virtuals: true,
+    transform: (doc, ret) => {
+      // convert image objects to simple url strings for legacy clients
+      if (ret.images && Array.isArray(ret.images)) {
+        ret.images = ret.images.map(img => img.url || img);
+      }
+      return ret;
+    }
+  },
   toObject: { virtuals: true }
+});
+
+// Virtual for compatibility with legacy frontend
+productSchema.virtual('price').get(function() {
+  return this.pricing?.sellingPrice;
+});
+productSchema.virtual('comparePrice').get(function() {
+  return this.pricing?.mrp;
 });
 
 // Virtual for discount percentage
@@ -487,7 +494,6 @@ productSchema.pre('save', function(next) {
 productSchema.index({ name: 'text', description: 'text', tags: 'text', brand: 'text' });
 productSchema.index({ category: 1, subcategory: 1, subSubCategory: 1 });
 productSchema.index({ featured: 1, isActive: 1 });
-productSchema.index({ sku: 1 });
 productSchema.index({ barcode: 1 });
 productSchema.index({ 'pricing.sellingPrice': 1 });
 productSchema.index({ stock: 1 });

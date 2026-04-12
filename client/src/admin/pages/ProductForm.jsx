@@ -25,11 +25,12 @@ const ProductForm = () => {
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(false);
     const [initialLoading, setInitialLoading] = useState(isEdit);
+    const [formErrors, setFormErrors] = useState({});
 
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const res = await categoryService.getAll();
+                const res = await categoryService.getHierarchy();
                 setCategories(res.data);
             } catch (error) {
                 toast.error('Failed to load categories');
@@ -50,7 +51,8 @@ const ProductForm = () => {
                     stock: p.stock,
                     active: p.active
                 });
-                setExistingImages(p.images || []);
+                // convert image objects to URL strings for backwards compatibility
+                setExistingImages((p.images || []).map(img => img.url || img));
             } catch (error) {
                 toast.error('Failed to load product details');
                 navigate('/admin/products');
@@ -66,6 +68,15 @@ const ProductForm = () => {
     const handleChange = (e) => {
         const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
         setFormData({ ...formData, [e.target.name]: value });
+        // clear related error
+        setFormErrors(prev => {
+            const updated = { ...prev };
+            // clear direct field as well as pricing paths
+            delete updated[e.target.name];
+            delete updated[`pricing.${e.target.name}`];
+            if (e.target.name === 'name') delete updated.slug;
+            return updated;
+        });
     };
 
     const handleImageChange = (e) => {
@@ -112,7 +123,14 @@ const ProductForm = () => {
             }
             navigate('/admin/products');
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Operation failed');
+            const resp = error.response?.data;
+            if (resp?.errors) {
+                // show individual field errors and global toast
+                setFormErrors(resp.errors);
+                toast.error('Please fix the highlighted fields');
+            } else {
+                toast.error(resp?.message || 'Operation failed');
+            }
         } finally {
             setLoading(false);
         }
@@ -146,6 +164,12 @@ const ProductForm = () => {
                                 value={formData.name}
                                 onChange={handleChange}
                             />
+                            {formErrors.name && (
+                                <p className="text-red-600 text-sm mt-1">{formErrors.name}</p>
+                            )}
+                            {formErrors.slug && (
+                                <p className="text-red-600 text-sm mt-1">{formErrors.slug}</p>
+                            )}
                         </div>
                         <div className="col-span-2">
                             <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
@@ -156,6 +180,9 @@ const ProductForm = () => {
                                 value={formData.description}
                                 onChange={handleChange}
                             />
+                            {formErrors.description && (
+                                <p className="text-red-600 text-sm mt-1">{formErrors.description}</p>
+                            )}
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
@@ -167,10 +194,32 @@ const ProductForm = () => {
                                 onChange={handleChange}
                             >
                                 <option value="">Select Category</option>
-                                {categories.map(cat => (
-                                    <option key={cat._id} value={cat._id}>{cat.name}</option>
-                                ))}
+                                {(() => {
+                                    const renderCategoryOptions = (cats, level = 0) => {
+                                        return cats.reduce((acc, cat) => {
+                                            acc.push(
+                                                <option key={cat._id} value={cat._id}>
+                                                    {'\u00A0'.repeat(level * 4)}
+                                                    {level > 0 ? '↳ ' : ''}
+                                                    {cat.name}
+                                                </option>
+                                            );
+                                            if (cat.children && cat.children.length > 0) {
+                                                acc.push(...renderCategoryOptions(cat.children, level + 1));
+                                            }
+                                            return acc;
+                                        }, []);
+                                    };
+                                    
+                                    // Categories state might be flat or tree. 
+                                    // If we use getHierarchy, it's a tree. 
+                                    // Let's ensure we fetch hierarchy in useEffect.
+                                    return renderCategoryOptions(categories);
+                                })()}
                             </select>
+                            {formErrors.category && (
+                                <p className="text-red-600 text-sm mt-1">{formErrors.category}</p>
+                            )}
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">Unit (e.g., 1 kg, 500g)</label>
@@ -182,6 +231,9 @@ const ProductForm = () => {
                                 value={formData.unit}
                                 onChange={handleChange}
                             />
+                            {formErrors.unit && (
+                                <p className="text-red-600 text-sm mt-1">{formErrors.unit}</p>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -201,6 +253,11 @@ const ProductForm = () => {
                                 value={formData.price}
                                 onChange={handleChange}
                             />
+                            {(formErrors.price || formErrors['pricing.sellingPrice']) && (
+                                <p className="text-red-600 text-sm mt-1">
+                                    {formErrors.price || formErrors['pricing.sellingPrice']}
+                                </p>
+                            )}
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">Compare Price (₹)</label>
@@ -212,6 +269,11 @@ const ProductForm = () => {
                                 value={formData.comparePrice}
                                 onChange={handleChange}
                             />
+                            {(formErrors.comparePrice || formErrors['pricing.mrp']) && (
+                                <p className="text-red-600 text-sm mt-1">
+                                    {formErrors.comparePrice || formErrors['pricing.mrp']}
+                                </p>
+                            )}
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">Stock Quantity</label>
@@ -224,6 +286,9 @@ const ProductForm = () => {
                                 value={formData.stock}
                                 onChange={handleChange}
                             />
+                            {formErrors.stock && (
+                                <p className="text-red-600 text-sm mt-1">{formErrors.stock}</p>
+                            )}
                         </div>
                         <div className="col-span-3">
                              <label className="flex items-center gap-2 cursor-pointer">
@@ -243,6 +308,10 @@ const ProductForm = () => {
                 {/* Images */}
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                     <h2 className="text-lg font-bold text-gray-900 mb-4">Product Images</h2>
+                    {formErrors.images && (
+                        <p className="text-red-600 text-sm mb-4">{formErrors.images}</p>
+                    )
+                    }
                     
                     {/* Existing Images */}
                     {isEdit && existingImages.length > 0 && (
@@ -250,7 +319,10 @@ const ProductForm = () => {
                             {existingImages.map((img, idx) => (
                                 <div key={idx} className="relative w-24 h-24 rounded-lg overflow-hidden border border-gray-200 group">
                                     <img 
-                                        src={`${import.meta.env.VITE_API_URL.replace('/api', '')}${img}`} 
+                                        src={typeof img === 'string' 
+                                            ? (img.startsWith('http') ? img : `${import.meta.env.VITE_API_URL.replace('/api', '')}/${img.startsWith('/') ? img.substring(1) : img}`)
+                                            : (img.url?.startsWith('http') ? img.url : `${import.meta.env.VITE_API_URL.replace('/api', '')}/${img.url?.startsWith('/') ? img.url.substring(1) : img.url}`)
+                                        } 
                                         alt="" 
                                         className="w-full h-full object-cover"
                                     />
@@ -292,8 +364,8 @@ const ProductForm = () => {
                         <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
                             <div className="flex flex-col items-center justify-center pt-5 pb-6">
                                 <Upload className="w-8 h-8 mb-3 text-gray-400" />
-                                <p className="text-sm text-gray-500"><span className="font-semibold">Click to upload</span> or drag and drop</p>
-                                <p className="text-xs text-gray-500">PNG, JPG or WEBP</p>
+                                <p className="text-sm text-gray-500"><span className="font-semibold">Click to upload multiple photos</span> or drag and drop</p>
+                                <p className="text-xs text-gray-500">PNG, JPG or WEBP (Max 10 images)</p>
                             </div>
                             <input 
                                 type="file" 

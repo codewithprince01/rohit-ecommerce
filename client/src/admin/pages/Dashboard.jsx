@@ -337,52 +337,26 @@ const Dashboard = () => {
     try {
       setLoading(true);
 
-      // Fetch data from multiple endpoints in parallel
-      const [
-        productsRes,
-        ordersRes,
-        inventoryStatsRes,
-        lowStockRes,
-        customerStatsRes,
-        orderStatsRes,
-      ] = await Promise.all([
-        api.get("/products?limit=1").catch(() => ({ data: { total: 0 } })),
-        api
-          .get("/orders?limit=10")
-          .catch(() => ({ data: { data: [], total: 0 } })),
-        api.get("/inventory/stats").catch(() => ({ data: {} })),
-        api.get("/inventory/alerts/low-stock").catch(() => ({ data: [] })),
-        api.get("/customers/stats").catch(() => ({ data: {} })),
-        api.get("/orders/stats").catch(() => ({ data: {} })),
-      ]);
+      // Fetch comprehensive dashboard data from the dedicated admin endpoint
+      const response = await api.get("/admin/dashboard");
+      const { stats: dashboardStats, recentOrders: latestOrders, topProducts } = response.data.data;
 
-      // Extract data safely
-      const productCount =
-        productsRes.data?.total || productsRes.data?.data?.length || 0;
-      const orders = ordersRes.data?.data || [];
-      const orderCount = ordersRes.data?.total || orders.length;
-      const inventoryStats = inventoryStatsRes.data || {};
-      const lowStockItems = lowStockRes.data || [];
-      const customerStats = customerStatsRes.data || {};
-      const orderStats = orderStatsRes.data || {};
-
+      // Extract data safely based on the backend payload structure
       setStats({
-        totalProducts: productCount,
-        totalOrders: orderStats.totalOrders || orderCount,
-        totalCustomers: customerStats.total || 0,
-        totalRevenue:
-          orderStats.revenue ||
-          orders.reduce(
-            (sum, o) => sum + (o.grandTotal || o.totalAmount || 0),
-            0,
-          ),
-        lowStockCount: inventoryStats.lowStock || 0,
-        pendingOrders:
-          orderStats.pending ||
-          orders.filter((o) => o.status === "pending").length,
+        totalProducts: dashboardStats.products.total || 0,
+        totalOrders: dashboardStats.orders.total || 0,
+        totalCustomers: dashboardStats.customers.total || 0,
+        totalRevenue: dashboardStats.revenue.total || 0,
+        lowStockCount: dashboardStats.products.lowStock || 0,
+        pendingOrders: dashboardStats.orders.pending || 0,
       });
 
-      setRecentOrders(orders.slice(0, 5));
+      setRecentOrders(latestOrders || []);
+
+      // We can also fetch dedicated low stock alerts if needed from admin, 
+      // but let's use the actual alerts endpoint to populate the sidebar widget correctly:
+      const lowStockRes = await api.get("/admin/dashboard/alerts/low-stock").catch(() => ({ data: { data: [] } }));
+      const lowStockItems = lowStockRes.data?.data || [];
 
       // Format low stock products for display
       const formattedLowStock = lowStockItems.slice(0, 5).map((item) => ({
@@ -395,7 +369,12 @@ const Dashboard = () => {
             : item.stock <= 5
               ? "bg-orange-100 text-orange-600"
               : "bg-yellow-100 text-yellow-700",
-        image: item.images?.[0]?.url || item.thumbnail,
+        image: (() => {
+          const img = item.thumbnail || item.images?.[0]?.url || item.images?.[0];
+          if (!img) return null;
+          if (typeof img === 'string' && img.startsWith('http')) return img;
+          return `${import.meta.env.VITE_API_URL.replace('/api', '')}/${typeof img === 'string' ? img : img.url}`;
+        })(),
       }));
 
       setLowStockProducts(

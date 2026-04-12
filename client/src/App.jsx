@@ -4,11 +4,11 @@ import { HelmetProvider } from "react-helmet-async";
 import { Toaster } from "react-hot-toast";
 import { AuthProvider } from "./context/AuthContext";
 import { CartProvider } from "./context/CartContext";
-import AdminRoute from "./components/auth/AdminRoute";
+import AdminRoute from "./admin/components/AdminRoute";
 
 // Layouts
 import MainLayout from "./layouts/MainLayout";
-import AdminLayout from "./layouts/AdminLayout";
+import AdminLayout from "./admin/layouts/AdminLayout";
 
 // Public Pages
 import Home from "./pages/public/Home";
@@ -24,16 +24,17 @@ import About from "./pages/public/About";
 import Contact from "./pages/public/Contact";
 
 // Admin Pages
-import AdminDashboard from "./pages/admin/Dashboard";
-import AdminProducts from "./pages/admin/Products";
-import ProductForm from "./pages/admin/ProductForm";
-import AdminCategories from "./pages/admin/Categories";
-import AdminOrders from "./pages/admin/Orders";
-import AdminInventory from "./pages/admin/Inventory";
-import AdminCustomers from "./pages/admin/Customers";
-import AdminCoupons from "./pages/admin/Coupons";
-import AdminSettings from "./pages/admin/AdminSettings";
-import AdminMessages from "./pages/admin/AdminMessages";
+import AdminDashboard from "./admin/pages/Dashboard";
+import AdminProducts from "./admin/pages/Products";
+import ProductForm from "./admin/pages/ProductForm";
+import AdminCategories from "./admin/pages/Categories";
+import AdminOrders from "./admin/pages/Orders";
+import AdminInventory from "./admin/pages/Inventory";
+import AdminCustomers from "./admin/pages/Customers";
+import AdminCoupons from "./admin/pages/Coupons";
+import AdminSettings from "./admin/pages/Settings";
+import AdminMessages from "./admin/pages/Messages";
+import AdminLogin from "./admin/pages/Login";
 
 function App() {
   return (
@@ -68,6 +69,9 @@ function App() {
                   <Route path="/about" element={<About />} />
                   <Route path="/contact" element={<Contact />} />
                 </Route>
+
+                {/* Admin Login - Separated from Public Login */}
+                <Route path="/admin/login" element={<AdminLogin />} />
 
                 {/* Admin Routes */}
                 <Route element={<AdminRoute />}>

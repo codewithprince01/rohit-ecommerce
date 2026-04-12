@@ -1,4 +1,4 @@
-import { Inventory } from '../models/Inventory.js';
+import Inventory from '../models/Inventory.js';
 import Product from '../models/Product.js';
 import AuditLog from '../models/AuditLog.js';
 

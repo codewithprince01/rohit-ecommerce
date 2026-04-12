@@ -13,8 +13,8 @@ const api = axios.create({
 // Request interceptor
 api.interceptors.request.use(
   (config) => {
-    // Add auth token if exists
-    const token = localStorage.getItem('token');
+    // Look for token in session storage (matching utils/api.js)
+    const token = sessionStorage.getItem('accessToken') || localStorage.getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -43,14 +43,15 @@ api.interceptors.response.use(
           withCredentials: true
         });
 
-        const { token } = response.data.data;
-        localStorage.setItem('token', token);
+        const { accessToken } = response.data.data;
+        sessionStorage.setItem('accessToken', accessToken);
 
         // Retry original request
-        originalRequest.headers.Authorization = `Bearer ${token}`;
+        originalRequest.headers.Authorization = `Bearer ${accessToken}`;
         return api(originalRequest);
       } catch (refreshError) {
         // Refresh failed, logout user
+        sessionStorage.removeItem('accessToken');
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         window.location.href = '/login';

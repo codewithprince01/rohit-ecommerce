@@ -61,59 +61,70 @@ const ProductDetails = () => {
         ? Math.round(((product.comparePrice - product.price) / product.comparePrice) * 100) 
         : 0;
 
+    const getProductImage = (img) => {
+        if (!img) return 'https://dummyimage.com/800x800/f3f4f6/9ca3af.png&text=' + encodeURIComponent(product.name);
+        const path = typeof img === 'string' ? img : img.url;
+        if (!path) return 'https://dummyimage.com/800x800/f3f4f6/9ca3af.png&text=' + encodeURIComponent(product.name);
+        if (path.startsWith('http')) return path;
+        const baseUrl = import.meta.env.VITE_API_URL.replace('/api', '');
+        return `${baseUrl}/${path.startsWith('/') ? path.substring(1) : path}`;
+    };
+
     return (
         <div className="min-h-screen bg-white">
             <Head 
                 title={product.name} 
                 description={product.description}
-                image={product.images?.[0] ? `${import.meta.env.VITE_API_URL.replace('/api', '')}${product.images[0]}` : null}
+                image={getProductImage(product.images?.[0])}
             />
 
             <div className="container-custom py-8">
                 {/* Breadcrumb */}
                 <nav className="flex items-center text-sm text-gray-500 mb-8 overflow-x-auto whitespace-nowrap pb-2">
-                    <Link to="/" className="hover:text-primary-600">Home</Link>
-                    <ChevronRight size={14} className="mx-2" />
-                    <Link to="/products" className="hover:text-primary-600">Products</Link>
-                    <ChevronRight size={14} className="mx-2" />
+                    <Link to="/" className="hover:text-primary-600 transition-colors">Home</Link>
+                    <ChevronRight size={14} className="mx-2 text-gray-300" />
+                    <Link to="/products" className="hover:text-primary-600 transition-colors">Products</Link>
+                    <ChevronRight size={14} className="mx-2 text-gray-300" />
                     {product.category && (
                         <>
-                            <Link to={`/category/${product.category.slug}`} className="hover:text-primary-600">{product.category.name}</Link>
-                            <ChevronRight size={14} className="mx-2" />
+                            <Link to={`/category/${product.category.slug}`} className="hover:text-primary-600 transition-colors">{product.category.name}</Link>
+                            <ChevronRight size={14} className="mx-2 text-gray-300" />
                         </>
                     )}
-                    <span className="text-gray-900 font-medium">{product.name}</span>
+                    <span className="text-gray-900 font-semibold">{product.name}</span>
                 </nav>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
                     {/* Image Gallery */}
-                    <div className="space-y-4">
-                        <div className="aspect-square bg-gray-50 rounded-2xl overflow-hidden border border-gray-100 relative group">
+                    <div className="space-y-6">
+                        <div className="aspect-square bg-white rounded-[32px] overflow-hidden border border-gray-100 relative group shadow-sm ring-1 ring-gray-100">
                             <img 
-                                src={product.images?.[selectedImage] ? `${import.meta.env.VITE_API_URL.replace('/api', '')}${product.images[selectedImage]}` : 'https://via.placeholder.com/600'} 
+                                src={getProductImage(product.images?.[selectedImage])} 
                                 alt={product.name} 
-                                className="w-full h-full object-contain mix-blend-multiply group-hover:scale-110 transition-transform duration-500"
+                                className="w-full h-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-700 ease-out p-8"
                             />
                             {discount > 0 && (
-                                <span className="absolute top-4 left-4 bg-red-500 text-white text-sm font-bold px-3 py-1 rounded-full shadow-lg">
-                                    -{discount}% OFF
-                                </span>
+                                <div className="absolute top-6 left-6 flex flex-col gap-2">
+                                    <span className="bg-red-500 text-white text-xs font-black px-4 py-1.5 rounded-full shadow-lg shadow-red-500/30 uppercase tracking-tighter">
+                                        Save {discount}%
+                                    </span>
+                                </div>
                             )}
                         </div>
                         {product.images?.length > 1 && (
-                            <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+                            <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide py-2">
                                 {product.images.map((img, idx) => (
                                     <button 
                                         key={idx}
                                         onClick={() => setSelectedImage(idx)}
-                                        className={`w-20 h-20 rounded-lg border-2 overflow-hidden flex-shrink-0 transition-all ${
-                                            selectedImage === idx ? 'border-primary-600 ring-2 ring-primary-100' : 'border-gray-200 hover:border-primary-300'
+                                        className={`w-24 h-24 rounded-2xl border-2 overflow-hidden flex-shrink-0 transition-all duration-300 ${
+                                            selectedImage === idx ? 'border-primary-600 ring-4 ring-primary-50' : 'border-gray-100 hover:border-primary-300 bg-gray-50/50 hover:bg-white'
                                         }`}
                                     >
                                         <img 
-                                            src={`${import.meta.env.VITE_API_URL.replace('/api', '')}${img}`} 
+                                            src={getProductImage(img)} 
                                             alt={`Thumbnail ${idx}`} 
-                                            className="w-full h-full object-cover"
+                                            className="w-full h-full object-cover p-2"
                                         />
                                     </button>
                                 ))}

@@ -779,8 +779,6 @@ orderSchema.statics.getOrderStats = function(startDate, endDate) {
   ]);
 };
 
-// Indexes
-orderSchema.index({ orderNumber: 1 });
 orderSchema.index({ customer: 1 });
 orderSchema.index({ status: 1 });
 orderSchema.index({ 'payment.status': 1 });

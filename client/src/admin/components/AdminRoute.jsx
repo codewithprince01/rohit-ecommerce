@@ -2,8 +2,10 @@ import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
 const AdminRoute = () => {
-    const { user, isAuthenticated, loading, isAdmin } = useAuth();
+    const auth = useAuth();
+    const { user, isAuthenticated, loading, isAdmin } = auth;
     
+    console.log('AdminRoute State:', { isAuthenticated, loading, isAdmin, role: user?.role });
     if (loading) {
         return (
             <div className="h-screen w-screen flex items-center justify-center">
@@ -13,11 +15,11 @@ const AdminRoute = () => {
     }
     
     if (!isAuthenticated) {
-        return <Navigate to="/login" replace />;
+        return <Navigate to="/admin/login" replace />;
     }
 
     if (!isAdmin) {
-        return <Navigate to="/" replace />;
+        return <Navigate to="/admin/login" replace />;
     }
 
     return <Outlet />;

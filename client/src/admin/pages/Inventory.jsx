@@ -25,7 +25,7 @@ import {
   Card,
   CardHeader,
   LoadingSpinner,
-} from "../../components/admin/AdminUI";
+} from "../components/AdminUI";
 import toast from "react-hot-toast";
 
 // Stock Adjustment Modal

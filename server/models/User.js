@@ -128,10 +128,15 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: null
   },
-  refreshToken: {
-    type: String,
-    select: false
-  },
+  // Authentication fields
+  refreshTokens: [{
+    token: { type: String, required: true },
+    createdAt: { type: Date, default: Date.now },
+    expiresAt: { type: Date, required: true },
+    userAgent: String,
+    ipAddress: String,
+    isRevoked: { type: Boolean, default: false }
+  }],
   passwordChangedAt: Date,
   passwordResetToken: String,
   passwordResetExpires: Date,
@@ -213,16 +218,58 @@ userSchema.methods.generateAccessToken = function() {
 };
 
 // Generate refresh token
-userSchema.methods.generateRefreshToken = function() {
-  return jwt.sign(
+userSchema.methods.generateRefreshToken = function(userAgent = '', ipAddress = '') {
+  const refreshToken = jwt.sign(
     { id: this._id },
     process.env.JWT_REFRESH_SECRET,
     { expiresIn: process.env.JWT_REFRESH_EXPIRY || '7d' }
   );
+  
+  // Store refresh token in database
+  const expiresAt = new Date();
+  expiresAt.setDate(expiresAt.getDate() + 7); // 7 days from now
+  
+  this.refreshTokens.push({
+    token: refreshToken,
+    createdAt: new Date(),
+    expiresAt,
+    userAgent,
+    ipAddress,
+    isRevoked: false
+  });
+  
+  // Remove expired tokens
+  this.refreshTokens = this.refreshTokens.filter(token => 
+    token.expiresAt > new Date() && !token.isRevoked
+  );
+  
+  return refreshToken;
 };
 
-// Indexes
-userSchema.index({ email: 1 });
+// Find valid refresh token
+userSchema.methods.findValidRefreshToken = function(token) {
+  return this.refreshTokens.find(rt => 
+    rt.token === token && 
+    rt.expiresAt > new Date() && 
+    !rt.isRevoked
+  );
+};
+
+// Revoke refresh token
+userSchema.methods.revokeRefreshToken = function(token) {
+  const refreshToken = this.refreshTokens.find(rt => rt.token === token);
+  if (refreshToken) {
+    refreshToken.isRevoked = true;
+  }
+};
+
+// Revoke all refresh tokens
+userSchema.methods.revokeAllRefreshTokens = function() {
+  this.refreshTokens.forEach(rt => {
+    rt.isRevoked = true;
+  });
+};
+
 userSchema.index({ role: 1 });
 userSchema.index({ isActive: 1 });
 

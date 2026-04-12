@@ -53,20 +53,6 @@ export const productSchema = Joi.object({
       'any.required': 'Category is required'
     }),
   
-  subcategory: Joi.string()
-    .pattern(/^[0-9a-fA-F]{24}$/)
-    .allow(null, '')
-    .messages({
-      'string.pattern.base': 'Invalid subcategory ID'
-    }),
-  
-  subSubCategory: Joi.string()
-    .pattern(/^[0-9a-fA-F]{24}$/)
-    .allow(null, '')
-    .messages({
-      'string.pattern.base': 'Invalid sub-subcategory ID'
-    }),
-  
   inStock: Joi.boolean()
     .default(true),
   
@@ -78,8 +64,14 @@ export const productSchema = Joi.object({
     .default([]),
   
   isActive: Joi.boolean()
-    .default(true)
-});
+    .default(true),
+  
+  stock: Joi.number()
+    .min(0)
+    .default(0),
+
+  images: Joi.array().items(Joi.any()).allow(null)
+}).unknown(true);
 
 // Product query validation
 export const productQuerySchema = Joi.object({
@@ -88,8 +80,6 @@ export const productQuerySchema = Joi.object({
   sort: Joi.string().valid('price', '-price', 'name', '-name', 'createdAt', '-createdAt').default('-createdAt'),
   search: Joi.string().trim().allow(''),
   category: Joi.string().pattern(/^[0-9a-fA-F]{24}$/),
-  subcategory: Joi.string().pattern(/^[0-9a-fA-F]{24}$/),
-  subSubCategory: Joi.string().pattern(/^[0-9a-fA-F]{24}$/),
   minPrice: Joi.number().min(0),
   maxPrice: Joi.number().min(0),
   inStock: Joi.string().valid('true', 'false'),

@@ -19,59 +19,51 @@ const importData = async () => {
 
     // Create Admin User
     const adminUser = await User.create({
-      name: 'Admin User',
-      email: 'admin@example.com',
-      password: 'password123', // Will be hashed by pre-save hook
+      name: 'Prince Admin',
+      email: 'prince@gmail.com',
+      password: 'Prince1234', // Will be hashed by pre-save hook
       role: 'admin',
       mobile: '9999999999',
       address: 'Admin HQ'
     });
 
-    // Create Categories
-    // Helper to create slug
-    const createSlug = (str) => str.toLowerCase().replace(/\s+/g, '-').replace(/[^\w\-]+/g, '');
-
-    // Create Categories with Slugs
+    // Create Categories with Hierarchy
     const categoriesData = [
-      { name: 'Fruits & Vegetables', order: 1 },
-      { name: 'Dairy & Bakery', order: 2 },
-      { name: 'Staples', order: 3 },
-      { name: 'Snacks & Branded Foods', order: 4 },
-      { name: 'Personal Care', order: 5 },
-      { name: 'Home Care', order: 6 },
-    ].map(cat => ({
-      ...cat,
-      slug: createSlug(cat.name)
-    }));
+      { name: 'Fruits & Vegetables', slug: 'fruits-vegetables', order: 1 },
+      { name: 'Dairy & Bakery', slug: 'dairy-bakery', order: 2 },
+      { name: 'Staples', slug: 'staples', order: 3 },
+      { name: 'Snacks & Branded Foods', slug: 'snacks-branded-foods', order: 4 },
+      { name: 'Personal Care', slug: 'personal-care', order: 5 },
+      { name: 'Home Care', slug: 'home-care', order: 6 },
+    ];
 
     const categories = await Category.insertMany(categoriesData);
 
-    // Create Subcategories for Fruits & Veg
-    const fv = categories[0];
-    const subcategoriesData = [
-      { name: 'Fresh Fruits', category: fv._id },
-      { name: 'Fresh Vegetables', category: fv._id },
-      { name: 'Herbs & Seasonings', category: fv._id },
-    ].map(sub => ({
-      ...sub,
-      slug: createSlug(sub.name)
-    }));
-
-    const subcategories = await Subcategory.insertMany(subcategoriesData);
+    // Create a subcategory under Fruits & Veg
+    const freshFruits = await Category.create({
+      name: 'Fresh Fruits',
+      slug: 'fresh-fruits',
+      parent: categories[0]._id,
+      order: 1
+    });
 
     // Create Sample Product
     await Product.create({
       name: 'Fresh Onion',
       slug: 'fresh-onion',
       description: 'High quality fresh onions.',
-      price: 30,
-      comparePrice: 40,
-      unit: '1 kg',
-      category: fv._id,
-      subcategory: subcategories[1]._id,
+      shortDescription: 'Fresh onions from the farm.',
+      pricing: {
+        mrp: 40,
+        sellingPrice: 30,
+        costPrice: 20,
+        taxRate: 5
+      },
+      unit: 'kg',
+      category: categories[0]._id,
       stock: 100,
-      images: [], // Add placeholder if needed
-      user: adminUser._id
+      images: [{ url: 'https://images.unsplash.com/photo-1580149405513-1f2e33f6406c?auto=format&fit=crop&q=80&w=300', isPrimary: true }],
+      createdBy: adminUser._id
     });
 
     console.log('Data Imported!');

@@ -45,7 +45,10 @@ const Cart = () => {
                                 {/* Image */}
                                 <Link to={`/product/${item.slug}`} className="w-24 h-24 sm:w-32 sm:h-32 bg-gray-50 rounded-lg overflow-hidden shrink-0">
                                     <img 
-                                        src={item.images?.[0] ? `${import.meta.env.VITE_API_URL.replace('/api', '')}${item.images[0]}` : 'https://via.placeholder.com/150'} 
+                                        src={item.images?.[0] 
+                                            ? `${import.meta.env.VITE_API_URL.replace('/api', '')}/${typeof item.images[0] === 'string' ? item.images[0] : item.images[0].url}` 
+                                            : 'https://via.placeholder.com/150?text=Product'
+                                        } 
                                         alt={item.name} 
                                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                     />

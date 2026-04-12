@@ -560,8 +560,6 @@ couponSchema.methods.useCoupon = function(customer, orderAmount, orderId) {
   return this.save();
 };
 
-// Indexes
-couponSchema.index({ code: 1 });
 couponSchema.index({ status: 1 });
 couponSchema.index({ type: 1 });
 couponSchema.index({ 'validity.startDate': 1 });

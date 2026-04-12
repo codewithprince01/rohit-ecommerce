@@ -14,6 +14,7 @@ import compression from 'compression';
 
 import connectDB from './config/db.js';
 import { errorHandler, notFound } from './middleware/errorHandler.js';
+import dbCheck from './middleware/dbCheck.js';
 
 // Import routes
 import authRoutes from './routes/authRoutes.js';
@@ -38,8 +39,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Body parser
-app.use(express.json({ limit: '10kb' }));
-app.use(express.urlencoded({ extended: true, limit: '10kb' }));
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(cookieParser());
 
 // Security Headers
@@ -58,23 +59,25 @@ app.use(mongoSanitize());
 // Prevent Parameter Pollution
 app.use(hpp());
 
-// Enable CORS (allow both client and admin panel)
-const allowedOrigins = [
-  process.env.CLIENT_URL || 'http://localhost:5173',
-  process.env.ADMIN_URL || 'http://localhost:5175'
-];
+// Enable CORS
 app.use(cors({
-  origin: function(origin, callback) {
-    // Allow requests with no origin (mobile apps, curl, etc)
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(null, true); // Allow all origins in development
-    }
-  },
-  credentials: true
+  origin: ['http://localhost:5173', 'http://localhost:5175'],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept']
 }));
+
+// Better error logging for debugging
+app.use((req, res, next) => {
+  const originalJson = res.json;
+  res.json = function(data) {
+    if (res.statusCode >= 400) {
+      console.log(`[Response Error] ${req.method} ${req.url} - Status: ${res.statusCode} - Message: ${data.message || 'No message'}`);
+    }
+    return originalJson.call(this, data);
+  };
+  next();
+});
 
 // Logger
 if (process.env.NODE_ENV === 'development') {
@@ -87,13 +90,16 @@ app.use(compression());
 // Rate Limiting
 const limiter = rateLimit({
   windowMs: 10 * 60 * 1000, // 10 mins
-  max: 100,
+  max: process.env.NODE_ENV === 'development' ? 1000 : 100,
   message: 'Too many requests from this IP, please try again after 10 minutes'
 });
 app.use('/api', limiter);
 
 // Static folder for uploads
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Apply DB check to all /api routes
+app.use('/api', dbCheck);
 
 // Mount routers
 app.use('/api/auth', authRoutes);

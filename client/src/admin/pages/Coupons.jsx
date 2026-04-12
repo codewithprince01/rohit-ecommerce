@@ -25,7 +25,7 @@ import {
   CardHeader,
   LoadingSpinner,
   EmptyState,
-} from "../../components/admin/AdminUI";
+} from "../components/AdminUI";
 import toast from "react-hot-toast";
 
 // Coupon Form Modal

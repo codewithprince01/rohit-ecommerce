@@ -2,6 +2,7 @@ import Product from '../models/Product.js';
 import Category from '../models/Category.js';
 import fs from 'fs';
 import path from 'path';
+import { productSchema } from '../validators/productValidator.js';
 
 // Helper
 const removeImage = (imagePath) => {
@@ -17,36 +18,82 @@ const removeImage = (imagePath) => {
 // @access  Private/Admin
 export const createProduct = async (req, res) => {
     try {
-        const { 
-            name, 
-            description, 
-            price, 
-            comparePrice, 
-            unit, 
-            category, 
-            subcategory, 
-            subSubCategory, 
-            stock, 
-            active 
-        } = req.body;
+        // perform Joi validation to catch missing/invalid fields early
+        const payload = {
+            ...req.body,
+            price: req.body.price !== undefined && req.body.price !== '' ? Number(req.body.price) : undefined,
+            comparePrice: req.body.comparePrice !== undefined && req.body.comparePrice !== '' ? Number(req.body.comparePrice) : undefined
+        };
+        const { error, value } = productSchema.validate(payload, { abortEarly: false });
+        if (error) {
+            const errors = {};
+            error.details.forEach(d => {
+                const key = Array.isArray(d.path) ? d.path.join('.') : d.path;
+                errors[key] = d.message;
+            });
+            return res.status(400).json({ success: false, message: 'Validation failed', errors });
+        }
 
+        const {
+            name,
+            description,
+            price,
+            comparePrice,
+            unit,
+            category,
+            stock,
+            active
+        } = value;
+
+        // Build pricing object expected by schema
+        const pricing = {
+            sellingPrice: price !== undefined ? Number(price) : undefined,
+            mrp: comparePrice !== undefined ? Number(comparePrice) : undefined
+        };
+        // default mrp to sellingPrice if not provided
+        if (pricing.mrp == null && pricing.sellingPrice != null) {
+            pricing.mrp = pricing.sellingPrice;
+        }
+
+        // Convert uploaded files into image objects
         let images = [];
         if (req.files && req.files.length > 0) {
-            images = req.files.map(file => file.path.replace(/\\/g, '/'));
+            images = req.files.map(file => ({ url: file.path.replace(/\\/g, '/') }));
+        }
+        // also accept image URLs passed in body (strings)
+        if (req.body.images && Array.isArray(req.body.images)) {
+            const bodyImgs = req.body.images.map(img => {
+                if (typeof img === 'string') return { url: img };
+                return img;
+            });
+            images = [...images, ...bodyImgs];
+        }
+
+        // Generate slug from name in case pre-save doesn't run or for updates later
+        let slug;
+        if (name) {
+            slug = name.toLowerCase()
+                .replace(/\s+/g, '-')
+                .replace(/[^\w\-]+/g, '')
+                .replace(/\-\-+/g, '-')
+                .replace(/^-+/, '')
+                .replace(/-+$/, '');
+        }
+        // fallback slug if generation results empty
+        if (!slug) {
+            slug = `prod-${Date.now().toString(36)}`;
         }
 
         const product = await Product.create({
             name,
+            slug,
             description,
-            price,
-            comparePrice: comparePrice || undefined,
+            pricing,
             unit,
             category,
-            subcategory: subcategory || undefined,
-            subSubCategory: subSubCategory || undefined,
             stock: stock || 0,
             images,
-            active: active === 'true' || active === true
+            isActive: active === 'true' || active === true
         });
 
         res.status(201).json({ success: true, data: product });
@@ -54,6 +101,15 @@ export const createProduct = async (req, res) => {
         // Cleanup images if failure
         if (req.files) {
             req.files.forEach(file => removeImage(file.path));
+        }
+        // Format mongoose validation errors for client
+        if (error.name === 'ValidationError') {
+            const errors = {};
+            Object.values(error.errors).forEach(err => {
+                // err.path may be like 'pricing.sellingPrice' or 'images'
+                errors[err.path] = err.message;
+            });
+            return res.status(400).json({ success: false, message: error.message, errors });
         }
         res.status(400).json({ success: false, message: error.message });
     }
@@ -78,12 +134,18 @@ export const getProducts = async (req, res) => {
         queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g, match => `$${match}`);
         const parsedQuery = JSON.parse(queryStr);
 
-        // Basic Search 
-        if (req.query.search) {
-             parsedQuery.$text = { $search: req.query.search };
+        // Handle Recursive Category Search
+        if (req.query.category) {
+            const categoryId = req.query.category;
+            const category = await Category.findById(categoryId);
+            if (category) {
+                const descendants = await category.getDescendants();
+                const categoryIds = [categoryId, ...descendants.map(d => d._id)];
+                parsedQuery.category = { $in: categoryIds };
+            }
         }
 
-        query = Product.find(parsedQuery).populate('category', 'name slug');
+        query = Product.find(parsedQuery).populate('category', 'name slug path');
 
         // Select Fields
         if (req.query.select) {
@@ -142,8 +204,7 @@ export const getProducts = async (req, res) => {
 export const getProduct = async (req, res) => {
     try {
         const product = await Product.findById(req.params.id)
-            .populate('category', 'name slug')
-            .populate('subcategory', 'name slug');
+            .populate('category', 'name slug path');
         
         if (!product) {
             return res.status(404).json({ success: false, message: 'Product not found' });
@@ -160,8 +221,7 @@ export const getProduct = async (req, res) => {
 export const getProductBySlug = async (req, res) => {
     try {
         const product = await Product.findOne({ slug: req.params.slug })
-            .populate('category', 'name slug')
-            .populate('subcategory', 'name slug');
+            .populate('category', 'name slug path');
 
         if (!product) {
             return res.status(404).json({ success: false, message: 'Product not found' });
@@ -182,15 +242,84 @@ export const updateProduct = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Product not found' });
         }
 
-        // Handle body
-        const fieldsToUpdate = { ...req.body };
+        // Validate provided fields
+        const payload = {
+            ...req.body,
+            price: req.body.price !== undefined && req.body.price !== '' ? Number(req.body.price) : undefined,
+            comparePrice: req.body.comparePrice !== undefined && req.body.comparePrice !== '' ? Number(req.body.comparePrice) : undefined
+        };
+
+        const { error, value } = productSchema.validate(payload, { abortEarly: false });
+        if (error) {
+            const errors = {};
+            error.details.forEach(d => {
+                const key = Array.isArray(d.path) ? d.path.join('.') : d.path;
+                errors[key] = d.message;
+            });
+            return res.status(400).json({ success: false, message: 'Validation failed', errors });
+        }
+
+        // apply validated payload fields
+        const fieldsToUpdate = { ...value };
         
-        // Handle Images
+        // Handle active status mapping
+        if (req.body.active !== undefined) {
+            fieldsToUpdate.isActive = req.body.active === 'true' || req.body.active === true;
+            delete fieldsToUpdate.active;
+        }
+
+        // If pricing fields are provided at root, move them inside pricing
+        if (fieldsToUpdate.price !== undefined || fieldsToUpdate.comparePrice !== undefined) {
+            fieldsToUpdate.pricing = fieldsToUpdate.pricing || {};
+            if (fieldsToUpdate.price !== undefined) fieldsToUpdate.pricing.sellingPrice = Number(fieldsToUpdate.price);
+            if (fieldsToUpdate.comparePrice !== undefined) fieldsToUpdate.pricing.mrp = Number(fieldsToUpdate.comparePrice);
+            delete fieldsToUpdate.price;
+            delete fieldsToUpdate.comparePrice;
+        }
+        // default mrp to sellingPrice when updating if missing
+        if (fieldsToUpdate.pricing) {
+            if (fieldsToUpdate.pricing.mrp == null && fieldsToUpdate.pricing.sellingPrice != null) {
+                fieldsToUpdate.pricing.mrp = fieldsToUpdate.pricing.sellingPrice;
+            }
+        }
+
+        // Handle slug regeneration when name changes
+        if (fieldsToUpdate.name) {
+            let generated = fieldsToUpdate.name.toLowerCase()
+                .replace(/\s+/g, '-')
+                .replace(/[^\w\-]+/g, '')
+                .replace(/\-\-+/g, '-')
+                .replace(/^-+/, '')
+                .replace(/-+$/, '');
+            if (!generated) {
+                generated = `prod-${Date.now().toString(36)}`;
+            }
+            fieldsToUpdate.slug = generated;
+        }
+        // if document somehow lacked slug, ensure one exists
+        if (!fieldsToUpdate.slug && !product.slug && product.name) {
+            let generated = product.name.toLowerCase()
+                .replace(/\s+/g, '-')
+                .replace(/[^\w\-]+/g, '')
+                .replace(/\-\-+/g, '-')
+                .replace(/^-+/, '')
+                .replace(/-+$/, '');
+            if (!generated) {
+                generated = `prod-${Date.now().toString(36)}`;
+            }
+            fieldsToUpdate.slug = generated;
+        }
+        
+        // Normalize any string images passed in body
+        if (fieldsToUpdate.images && Array.isArray(fieldsToUpdate.images)) {
+            fieldsToUpdate.images = fieldsToUpdate.images.map(img => (typeof img === 'string' ? { url: img } : img));
+        }
+
+        // Handle Images from file uploads
         if (req.files && req.files.length > 0) {
-             const newImages = req.files.map(file => file.path.replace(/\\/g, '/'));
-             // Append or Replace? Usually append or complex logic. 
-             // To keep it simple: Append
-             fieldsToUpdate.images = [...product.images, ...newImages];
+             const newImages = req.files.map(file => ({ url: file.path.replace(/\\/g, '/') }));
+             const currentImages = fieldsToUpdate.images || (product.images ? product.images.map(img => (img.toObject ? img.toObject() : img)) : []);
+             fieldsToUpdate.images = [...currentImages, ...newImages];
         }
 
         product = await Product.findByIdAndUpdate(req.params.id, fieldsToUpdate, {
@@ -200,10 +329,18 @@ export const updateProduct = async (req, res) => {
 
         res.json({ success: true, data: product });
     } catch (error) {
+        console.error('Update Product Error:', error);
         if (req.files) {
             req.files.forEach(file => removeImage(file.path));
         }
-        res.status(400).json({ success: false, message: error.message });
+        if (error.name === 'ValidationError') {
+            const errors = {};
+            Object.values(error.errors).forEach(err => {
+                errors[err.path] = err.message;
+            });
+            return res.status(400).json({ success: false, message: error.message, errors });
+        }
+        res.status(500).json({ success: false, message: error.message || 'Internal server error' });
     }
 };
 
@@ -219,7 +356,7 @@ export const deleteProduct = async (req, res) => {
 
         // Delete images
         if (product.images && product.images.length > 0) {
-            product.images.forEach(img => removeImage(img));
+            product.images.forEach(imgObj => removeImage(imgObj.url || imgObj));
         }
 
         await product.deleteOne();
@@ -240,9 +377,11 @@ export const deleteProductImage = async (req, res) => {
         
         if (!product) return res.status(404).json({ success: false, message: 'Product not found' });
 
-        if (product.images.includes(imagePath)) {
+        // find index by url property
+        const idx = product.images.findIndex(img => img.url === imagePath || img === imagePath);
+        if (idx !== -1) {
             // Remove from array
-            product.images = product.images.filter(img => img !== imagePath);
+            product.images.splice(idx, 1);
             await product.save();
 
             // Attempt file deletion

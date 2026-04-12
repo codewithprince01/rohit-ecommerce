@@ -368,8 +368,6 @@ categorySchema.methods.getDescendants = async function(maxLevel = 3) {
   return descendants;
 };
 
-// Indexes
-categorySchema.index({ slug: 1 });
 categorySchema.index({ parent: 1 });
 categorySchema.index({ level: 1 });
 categorySchema.index({ priority: -1, sortOrder: 1 });

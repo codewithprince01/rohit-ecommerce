@@ -25,7 +25,7 @@ import {
   Card,
   CardHeader,
   EmptyState,
-} from "../../components/admin/AdminUI";
+} from "../components/AdminUI";
 import toast from "react-hot-toast";
 
 // Customer Detail Modal

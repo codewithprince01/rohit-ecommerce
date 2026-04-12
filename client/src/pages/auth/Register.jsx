@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { Mail, Lock, User, UserPlus, Phone, MapPin, ArrowLeft } from 'lucide-react';
+import { Mail, Lock, User, UserPlus, Phone, MapPin, ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import Head from '../../components/common/Head';
 
 const Register = () => {
@@ -12,19 +12,75 @@ const Register = () => {
         name: '',
         email: '',
         password: '',
+        confirmPassword: '',
         mobile: '',
         address: ''
     });
     const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [errors, setErrors] = useState({});
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
+        // Clear error when user starts typing
+        if (errors[e.target.name]) {
+            setErrors({ ...errors, [e.target.name]: '' });
+        }
+    };
+
+    const validateForm = () => {
+        const newErrors = {};
+        
+        if (!formData.name.trim()) {
+            newErrors.name = 'Name is required';
+        }
+        
+        if (!formData.email.trim()) {
+            newErrors.email = 'Email is required';
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+            newErrors.email = 'Invalid email format';
+        }
+        
+        if (!formData.password) {
+            newErrors.password = 'Password is required';
+        } else if (formData.password.length < 6) {
+            newErrors.password = 'Password must be at least 6 characters';
+        }
+        
+        if (!formData.confirmPassword) {
+            newErrors.confirmPassword = 'Please confirm your password';
+        } else if (formData.password !== formData.confirmPassword) {
+            newErrors.confirmPassword = 'Passwords do not match';
+        }
+        
+        if (!formData.mobile.trim()) {
+            newErrors.mobile = 'Mobile number is required';
+        } else if (!/^[0-9]{10}$/.test(formData.mobile)) {
+            newErrors.mobile = 'Invalid mobile number (10 digits required)';
+        }
+        
+        if (!formData.address.trim()) {
+            newErrors.address = 'Address is required';
+        }
+        
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        
+        if (!validateForm()) {
+            return;
+        }
+        
         setLoading(true);
-        const success = await register(formData);
+        
+        // Remove confirmPassword before sending to API
+        const { confirmPassword, ...registrationData } = formData;
+        
+        const success = await register(registrationData);
         if (success) {
             navigate('/login');
         }
@@ -66,12 +122,13 @@ const Register = () => {
                                     name="name"
                                     type="text"
                                     required
-                                    className="input pl-10"
+                                    className={`input pl-10 ${errors.name ? 'border-red-500' : ''}`}
                                     placeholder="John Doe"
                                     value={formData.name}
                                     onChange={handleChange}
                                 />
                             </div>
+                            {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
                         </div>
 
                         <div className="relative">
@@ -86,13 +143,14 @@ const Register = () => {
                                     required
                                     pattern="[0-9]{10}"
                                     title="10 digit mobile number"
-                                    className="input pl-10"
+                                    className={`input pl-10 ${errors.mobile ? 'border-red-500' : ''}`}
                                     placeholder="9876543210"
                                     value={formData.mobile}
                                     onChange={handleChange}
                                     maxLength="10"
                                 />
                             </div>
+                            {errors.mobile && <p className="text-red-500 text-xs mt-1">{errors.mobile}</p>}
                         </div>
                     </div>
 
@@ -106,12 +164,13 @@ const Register = () => {
                                 name="email"
                                 type="email"
                                 required
-                                className="input pl-10"
+                                className={`input pl-10 ${errors.email ? 'border-red-500' : ''}`}
                                 placeholder="you@example.com"
                                 value={formData.email}
                                 onChange={handleChange}
                             />
                         </div>
+                        {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
                     </div>
 
                     <div className="relative">
@@ -122,14 +181,48 @@ const Register = () => {
                             </div>
                             <input
                                 name="password"
-                                type="password"
+                                type={showPassword ? 'text' : 'password'}
                                 required
-                                className="input pl-10"
+                                className={`input pl-10 pr-10 ${errors.password ? 'border-red-500' : ''}`}
                                 placeholder="Min 6 characters"
                                 value={formData.password}
                                 onChange={handleChange}
                             />
+                            <button
+                                type="button"
+                                className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                                onClick={() => setShowPassword(!showPassword)}
+                            >
+                                {showPassword ? <EyeOff className="h-5 w-5 text-gray-400" /> : <Eye className="h-5 w-5 text-gray-400" />}
+                            </button>
                         </div>
+                        {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
+                    </div>
+
+                    <div className="relative">
+                        <label className="text-xs font-semibold text-gray-500 ml-1">Confirm Password</label>
+                        <div className="relative mt-1">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <Lock className="h-5 w-5 text-gray-400" />
+                            </div>
+                            <input
+                                name="confirmPassword"
+                                type={showConfirmPassword ? 'text' : 'password'}
+                                required
+                                className={`input pl-10 pr-10 ${errors.confirmPassword ? 'border-red-500' : ''}`}
+                                placeholder="Confirm your password"
+                                value={formData.confirmPassword}
+                                onChange={handleChange}
+                            />
+                            <button
+                                type="button"
+                                className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                            >
+                                {showConfirmPassword ? <EyeOff className="h-5 w-5 text-gray-400" /> : <Eye className="h-5 w-5 text-gray-400" />}
+                            </button>
+                        </div>
+                        {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>}
                     </div>
 
                     <div className="relative">
@@ -142,12 +235,13 @@ const Register = () => {
                                 name="address"
                                 required
                                 rows="2"
-                                className="input pl-10 resize-none"
+                                className={`input pl-10 resize-none ${errors.address ? 'border-red-500' : ''}`}
                                 placeholder="Your full delivery address"
                                 value={formData.address}
                                 onChange={handleChange}
                             />
                         </div>
+                        {errors.address && <p className="text-red-500 text-xs mt-1">{errors.address}</p>}
                     </div>
 
                     <div className="pt-2">

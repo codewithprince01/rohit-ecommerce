@@ -18,13 +18,16 @@ const removeImage = (imagePath) => {
 // @access  Private/Admin
 export const createCategory = async (req, res) => {
     try {
-        const { name, description } = req.body;
+        const { name, description, parent, priority, isActive } = req.body;
         const image = req.file ? req.file.path.replace(/\\/g, '/') : null;
 
         const category = await Category.create({
             name,
             description,
-            image
+            image,
+            parent: parent || null,
+            priority: priority || 0,
+            isActive: isActive !== undefined ? isActive : true
         });
 
         res.status(201).json({ success: true, data: category });
@@ -34,15 +37,35 @@ export const createCategory = async (req, res) => {
     }
 };
 
-// @desc    Get all categories (Main level)
+// @desc    Get all categories (Main level or all depending on query)
 // @route   GET /api/categories
 // @access  Public
 export const getCategories = async (req, res) => {
     try {
-        const categories = await Category.find({}).sort('order name');
+        // If the frontend fetches the tree, it expects the hierarchy
+        let query = {};
+        if (req.query.includeInactive === 'false') {
+            query.isActive = true;
+        }
+
+        // We fetch flat categories if requested
+        const categories = await Category.find(query).sort('order priority name');
         res.json({ success: true, count: categories.length, data: categories });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+// @desc    Get full hierarchy (Infinite Nesting)
+// @route   GET /api/categories/hierarchy
+// @access  Public
+export const getHierarchy = async (req, res) => {
+    try {
+        // Retrieve the deeply nested hierarchy using the existing static method in Category.js
+        const tree = await Category.getTree();
+        res.json({ success: true, data: tree });
+    } catch (error) {
+         res.status(500).json({ success: false, message: error.message });
     }
 };
 
@@ -86,7 +109,7 @@ export const updateCategory = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Category not found' });
         }
 
-        const { name, description, isActive } = req.body;
+        const { name, description, parent, isActive, priority } = req.body;
         let image = category.image;
 
         if (req.file) {
@@ -97,7 +120,9 @@ export const updateCategory = async (req, res) => {
         category.name = name || category.name;
         category.description = description || category.description;
         category.image = image;
+        if (parent !== undefined) category.parent = parent || null;
         if(isActive !== undefined) category.isActive = isActive;
+        if(priority !== undefined) category.priority = priority;
 
         await category.save();
 
@@ -131,35 +156,9 @@ export const deleteCategory = async (req, res) => {
 // @access  Public
 export const getSubcategories = async (req, res) => {
     try {
-        // This assumes we want Level 2 categories for a Level 1 parent
-        const subcategories = await Subcategory.find({ category: req.params.id }).sort('name');
+        const subcategories = await Category.find({ parent: req.params.id }).sort('name');
         res.json({ success: true, count: subcategories.length, data: subcategories });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
-    }
-};
-
-// @desc    Get full hierarchy (Demo purpose)
-// @route   GET /api/categories/hierarchy
-// @access  Public
-export const getHierarchy = async (req, res) => {
-    try {
-        // Fetch specific fields to be lightweight? For now full fetch.
-        const categories = await Category.find({ isActive: true }).lean();
-        const subcategories = await Subcategory.find({ isActive: true }).lean();
-        const subSubcategories = await SubSubCategory.find({ isActive: true }).lean();
-
-        // Build Tree
-        const tree = categories.map(cat => {
-            const subs = subcategories.filter(sub => String(sub.category) === String(cat._id)).map(sub => {
-                const subSubs = subSubcategories.filter(ss => String(ss.subcategory) === String(sub._id));
-                return { ...sub, subSubCategories: subSubs };
-            });
-            return { ...cat, subCategories: subs };
-        });
-
-        res.json({ success: true, data: tree });
-    } catch (error) {
-         res.status(500).json({ success: false, message: error.message });
     }
 };

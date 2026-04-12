@@ -20,7 +20,7 @@ import {
   CardHeader,
   LoadingSpinner,
   EmptyState,
-} from "../../components/admin/AdminUI";
+} from "../components/AdminUI";
 import toast from "react-hot-toast";
 
 // Category Form Modal
@@ -123,13 +123,26 @@ const CategoryFormModal = ({
             className="w-full px-4 py-2.5 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700"
           >
             <option value="">None (Top Level)</option>
-            {categories
-              .filter((cat) => cat._id !== category?._id)
-              .map((cat) => (
-                <option key={cat._id} value={cat._id}>
-                  {cat.parent ? `— ${cat.name}` : cat.name}
-                </option>
-              ))}
+            {(() => {
+                const renderOptions = (cats, level = 0) => {
+                    return cats.reduce((acc, cat) => {
+                        if (cat._id !== category?._id) {
+                            acc.push(
+                                <option key={cat._id} value={cat._id}>
+                                    {'\u00A0'.repeat(level * 4)}
+                                    {level > 0 ? '↳ ' : ''}
+                                    {cat.name}
+                                </option>
+                            );
+                            if (cat.children && cat.children.length > 0) {
+                                acc.push(...renderOptions(cat.children, level + 1));
+                            }
+                        }
+                        return acc;
+                    }, []);
+                };
+                return renderOptions(categories); // Note: we need to pass 'categories' state here, change component prop mapping
+            })()}
           </select>
         </div>
 
@@ -307,7 +320,10 @@ const CategoryTreeItem = ({
         {category.image && (
           <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
             <img
-              src={category.image}
+              src={category.image.startsWith('http') 
+                ? category.image 
+                : `${import.meta.env.VITE_API_URL.replace('/api', '')}/${category.image}`
+              }
               alt={category.name}
               className="w-full h-full object-cover"
             />
@@ -405,44 +421,19 @@ const Categories = () => {
   const fetchCategories = async () => {
     try {
       setLoading(true);
-      const response = await api.get("/categories");
-      const data = response.data.data || response.data || [];
+      // Fetch flat categories for search/list
+      const flatRes = await api.get("/categories");
+      setFlatCategories(flatRes.data.data || flatRes.data || []);
 
-      // Store flat list for dropdown
-      setFlatCategories(data);
-
-      // Build tree structure
-      const tree = buildCategoryTree(data);
-      setCategories(tree);
+      // Fetch official hierarchy from backend
+      const hierarchyRes = await api.get("/categories/hierarchy");
+      setCategories(hierarchyRes.data.data || hierarchyRes.data || []);
     } catch (error) {
       console.error("Error fetching categories:", error);
       toast.error("Failed to fetch categories");
     } finally {
       setLoading(false);
     }
-  };
-
-  const buildCategoryTree = (categories) => {
-    const map = {};
-    const roots = [];
-
-    // Create map of all categories
-    categories.forEach((cat) => {
-      map[cat._id] = { ...cat, children: [] };
-    });
-
-    // Build tree
-    categories.forEach((cat) => {
-      if (cat.parent && map[cat.parent]) {
-        map[cat.parent].children.push(map[cat._id]);
-      } else if (cat.parent?._id && map[cat.parent._id]) {
-        map[cat.parent._id].children.push(map[cat._id]);
-      } else {
-        roots.push(map[cat._id]);
-      }
-    });
-
-    return roots;
   };
 
   const handleSave = async (formData, categoryId) => {
@@ -581,7 +572,7 @@ const Categories = () => {
         category={formModal.category}
         parentCategory={formModal.parent}
         onSave={handleSave}
-        categories={flatCategories}
+        categories={categories}
       />
 
       {/* Delete Confirmation */}

@@ -26,6 +26,8 @@ const errorHandler = (err, req, res, next) => {
         message = Object.values(err.errors).map((val) => val.message).join(', ');
     }
 
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:5173');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
     res.status(statusCode).json({
         success: false,
         message,

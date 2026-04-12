@@ -26,7 +26,7 @@ import {
   CardHeader,
   EmptyState,
   LoadingSpinner,
-} from "../../components/admin/AdminUI";
+} from "../components/AdminUI";
 import toast from "react-hot-toast";
 
 const Products = () => {
@@ -142,11 +142,12 @@ const Products = () => {
             product.thumbnail ||
             product.images?.[0] ? (
               <img
-                src={
-                  product.images?.[0]?.url ||
-                  product.thumbnail ||
-                  product.images?.[0]
-                }
+                src={(() => {
+                  const img = product.images?.[0]?.url || product.thumbnail || product.images?.[0];
+                  if (!img) return '';
+                  if (typeof img === 'string' && img.startsWith('http')) return img;
+                  return `${import.meta.env.VITE_API_URL.replace('/api', '')}/${typeof img === 'string' ? img : img.url}`;
+                })()}
                 alt={product.name}
                 className="w-full h-full object-cover"
               />

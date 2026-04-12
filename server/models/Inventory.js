@@ -648,4 +648,5 @@ inventorySchema.index({ lastUpdated: -1 });
 
 const Inventory = mongoose.model('Inventory', inventorySchema);
 
-export { Inventory, inventoryTransactionSchema, inventoryAlertSchema, stockCountSchema };
+export { inventoryTransactionSchema, inventoryAlertSchema, stockCountSchema };
+export default Inventory;

@@ -89,7 +89,10 @@ const ProductDetail = () => {
           <div>
             <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden mb-4">
               <img
-                src={`http://localhost:5000${images[selectedImage]}`}
+                src={images[selectedImage]?.url 
+                  ? `${import.meta.env.VITE_API_URL.replace('/api', '')}/${images[selectedImage].url}`
+                  : (typeof images[selectedImage] === 'string' ? images[selectedImage] : 'https://via.placeholder.com/600x600?text=No+Image')
+                }
                 alt={product.name}
                 className="w-full h-full object-cover"
               />
@@ -105,7 +108,10 @@ const ProductDetail = () => {
                     }`}
                   >
                     <img
-                      src={`http://localhost:5000${img}`}
+                      src={img.url 
+                        ? `${import.meta.env.VITE_API_URL.replace('/api', '')}/${img.url}`
+                        : (typeof img === 'string' ? img : 'https://via.placeholder.com/600x600?text=No+Image')
+                      }
                       alt={`${product.name} ${idx + 1}`}
                       className="w-full h-full object-cover"
                     />
@@ -213,8 +219,8 @@ const ProductDetail = () => {
                 >
                   <div className="aspect-square overflow-hidden bg-gray-100">
                     <img
-                      src={relatedProduct.images?.[0] 
-                        ? `http://localhost:5000${relatedProduct.images[0]}`
+                      src={relatedProduct.images?.[0]?.url 
+                        ? `${import.meta.env.VITE_API_URL.replace('/api', '')}/${relatedProduct.images[0].url}`
                         : 'https://via.placeholder.com/300x300?text=No+Image'
                       }
                       alt={relatedProduct.name}

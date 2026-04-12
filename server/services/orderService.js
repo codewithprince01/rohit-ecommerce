@@ -125,7 +125,7 @@ class OrderService {
                 throw new Error(`Insufficient stock for ${product.name}`);
             }
 
-            const itemPrice = product.price;
+            const itemPrice = product.pricing?.sellingPrice || product.price || 0;
             const itemSubtotal = itemPrice * item.quantity;
             subtotal += itemSubtotal;
 
@@ -134,7 +134,7 @@ class OrderService {
                 name: product.name,
                 quantity: item.quantity,
                 price: itemPrice,
-                image: product.images?.[0]?.url || product.thumbnail,
+                image: product.images?.[0]?.url || product.images?.[0] || product.thumbnail,
                 subtotal: itemSubtotal
             });
 

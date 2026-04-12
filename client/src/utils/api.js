@@ -4,18 +4,21 @@ import toast from 'react-hot-toast';
 // API base URL - can be configured via environment variable
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
+// Create axios instance with secure defaults
 const api = axios.create({
   baseURL: API_BASE_URL,
-  withCredentials: true,
+  withCredentials: true, // Important for refresh token cookies
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// Request interceptor - add auth token
+// Request interceptor - add access token from memory
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('accessToken');
+    // Get token from AuthContext (we'll need to access this differently)
+    // For now, we'll use a temporary approach
+    const token = sessionStorage.getItem('accessToken');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -26,7 +29,7 @@ api.interceptors.request.use(
   }
 );
 
-// Response interceptor - handle errors and refresh token
+// Response interceptor - handle token refresh
 api.interceptors.response.use(
   (response) => {
     return response;
@@ -39,29 +42,39 @@ api.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
-        // Try to refresh the token
-        const response = await axios.post(`${API_BASE_URL}/auth/refresh`, {}, {
-          withCredentials: true
+        // Try to refresh the token using refresh token cookie
+        const refreshResponse = await axios.post(`${API_BASE_URL}/auth/refresh`, {}, {
+          withCredentials: true,
+          headers: {
+            'Content-Type': 'application/json',
+          },
         });
 
-        // Save new token
-        const { accessToken } = response.data;
-        if (accessToken) {
-          localStorage.setItem('accessToken', accessToken);
-          originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+        if (refreshResponse.data.success && refreshResponse.data.data.accessToken) {
+          const newAccessToken = refreshResponse.data.data.accessToken;
+          
+          // Update token in sessionStorage
+          sessionStorage.setItem('accessToken', newAccessToken);
+          
+          // Update original request with new token
+          originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+          
+          // Retry the original request
+          return api(originalRequest);
         }
-
-        // Retry the original request
-        return api(originalRequest);
       } catch (refreshError) {
-        // Refresh failed, clear tokens and redirect to login
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('user');
+        // Refresh failed - clear token and redirect to login
+        sessionStorage.removeItem('accessToken');
         
-        // Only redirect if we're on an admin page
-        if (window.location.pathname.startsWith('/admin')) {
+        // Only redirect if we're on an admin or protected page
+        if (window.location.pathname.startsWith('/admin') || 
+            window.location.pathname.startsWith('/profile')) {
           window.location.href = '/login';
         }
+        
+        // Show toast for authentication failure
+        toast.error('Session expired. Please login again.');
+        
         return Promise.reject(refreshError);
       }
     }
@@ -69,14 +82,29 @@ api.interceptors.response.use(
     // Handle other error responses
     const message = error.response?.data?.message || error.message || 'Something went wrong';
     
-    // Don't show toast for certain errors
-    if (error.response?.status !== 401 && error.response?.status !== 403) {
-      // Toast is optional here, components can handle errors themselves
+    // Show toast for server errors (5xx) and client errors (4xx except 401/403)
+    if (error.response?.status >= 400 && error.response?.status !== 401 && error.response?.status !== 403) {
+      toast.error(message);
     }
 
     return Promise.reject(error);
   }
 );
+
+// Helper function to set access token (to be called from AuthContext)
+export const setAccessToken = (token) => {
+  sessionStorage.setItem('accessToken', token);
+};
+
+// Helper function to get access token
+export const getAccessToken = () => {
+  return sessionStorage.getItem('accessToken');
+};
+
+// Helper function to clear access token
+export const clearAccessToken = () => {
+  sessionStorage.removeItem('accessToken');
+};
 
 // Helper functions for common API calls
 export const apiHelper = {
@@ -128,7 +156,8 @@ export const apiHelper = {
   login: (credentials) => api.post('/auth/login', credentials),
   register: (data) => api.post('/auth/register', data),
   logout: () => api.post('/auth/logout'),
-  getProfile: () => api.get('/auth/profile'),
+  getMe: () => api.get('/auth/me'),
+  logoutAll: () => api.post('/auth/logout-all'),
   
   // Settings
   getSettings: () => api.get('/settings'),
