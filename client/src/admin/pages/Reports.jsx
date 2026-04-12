@@ -91,8 +91,8 @@ const Reports = () => {
              onClick={() => setActiveReport(tab.id)}
              className={`flex items-center gap-3 px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-wider transition-all border ${
                activeReport === tab.id
-               ? "bg-gray-900 text-white border-gray-900 shadow-lg"
-               : "bg-white border-gray-100 text-gray-500 hover:bg-gray-50"
+               ? "bg-gray-900 dark:bg-primary-600 text-white border-gray-900 dark:border-primary-600 shadow-lg"
+               : "bg-white dark:bg-gray-800 border-gray-100 dark:border-gray-700 text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-700"
              }`}
            >
              <tab.icon size={16} /> {tab.label}
