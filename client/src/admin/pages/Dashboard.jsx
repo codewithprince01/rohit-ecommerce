@@ -28,25 +28,25 @@ import api from "../../services/api"; // Using the synchronized service
 
 const StatCard = ({ title, value, change, changeType, icon: Icon, color, loading }) => {
   const colorClasses = {
-    blue: "from-blue-500 to-blue-600 shadow-blue-500/30",
+    blue: "from-primary-500 to-primary-600 shadow-primary-500/30",
     green: "from-emerald-500 to-emerald-600 shadow-emerald-500/30",
-    purple: "from-purple-500 to-purple-600 shadow-purple-500/30",
+    purple: "from-primary-600 to-primary-700 shadow-primary-600/30",
     orange: "from-orange-500 to-orange-600 shadow-orange-500/30",
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-3xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+    <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
       <div className="flex items-start justify-between">
         <div className="flex-1">
-          <p className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+          <p className="text-sm font-semibold text-gray-400 dark:text-gray-400 uppercase tracking-wider">
             {title}
           </p>
-          <h3 className="text-3xl font-black text-gray-900 dark:text-white mt-2 font-display">
+          <h3 className="text-3xl font-bold text-gray-900 dark:text-white mt-2">
             {loading ? <div className="h-9 w-24 bg-gray-100 dark:bg-gray-700 rounded-lg animate-pulse" /> : value}
           </h3>
           {change && (
             <div className={`flex items-center gap-1 mt-3 px-2 py-0.5 rounded-full w-fit text-[11px] font-bold ${
-              changeType === "positive" ? "bg-emerald-50 text-emerald-600" : "bg-red-50 text-red-500"
+              changeType === "positive" ? "bg-primary-50 text-primary-600" : "bg-red-50 text-red-500"
             }`}>
               {changeType === "positive" ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
               <span>{change}</span>
@@ -63,9 +63,9 @@ const StatCard = ({ title, value, change, changeType, icon: Icon, color, loading
 
 const ActivityItem = ({ activity }) => {
   const icons = {
-    order: { icon: ShoppingCart, color: "bg-blue-100 text-blue-600 border-blue-200" },
-    customer: { icon: UserPlus, color: "bg-purple-100 text-purple-600 border-purple-200" },
-    product: { icon: Package, color: "bg-emerald-100 text-emerald-600 border-emerald-200" },
+    order: { icon: ShoppingCart, color: "bg-primary-50 text-primary-600 border-primary-200" },
+    customer: { icon: UserPlus, color: "bg-primary-100 text-primary-700 border-primary-200" },
+    product: { icon: Package, color: "bg-emerald-50 text-emerald-600 border-emerald-200" },
   };
   const { icon: Icon, color } = icons[activity.type] || icons.order;
 
@@ -109,7 +109,7 @@ const TopProductCard = ({ product }) => (
       </div>
     </div>
     <div className="text-right">
-      <span className="text-xs font-black text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg">
+      <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg">
         {Math.round((product.totalSold * product.price) / 1000)}k
       </span>
     </div>
@@ -174,12 +174,12 @@ const Dashboard = () => {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h1 className="text-3xl font-black text-gray-900 dark:text-white font-display tracking-tight">Admin Dashboard</h1>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">Admin Dashboard</h1>
           <p className="text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-2">
             <Clock size={16} /> Data updated every 15 minutes
           </p>
         </div>
-        <div className="flex items-center gap-2 bg-white dark:bg-gray-800 p-1.5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+        <div className="flex items-center gap-2 bg-white dark:bg-gray-800 p-1.5 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
           <button 
             onClick={fetchDashboardData}
             className="p-2.5 hover:bg-gray-50 text-gray-400 hover:text-primary-600 transition-all active:scale-95"
@@ -192,7 +192,7 @@ const Dashboard = () => {
               <button
                 key={p}
                 onClick={() => setActivePeriod(p)}
-                className={`px-4 py-2 text-xs font-black rounded-xl transition-all ${
+                className={`px-4 py-2 text-xs font-bold rounded-lg transition-all ${
                   activePeriod === p 
                     ? "bg-primary-600 text-white shadow-lg shadow-primary-600/30" 
                     : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"

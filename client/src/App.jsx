@@ -25,6 +25,7 @@ import Contact from "./pages/public/Contact";
 
 // Admin Pages
 import AdminDashboard from "./admin/pages/Dashboard";
+import AdminAnalytics from "./admin/pages/Analytics";
 import AdminProducts from "./admin/pages/Products";
 import ProductForm from "./admin/pages/ProductForm";
 import AdminCategories from "./admin/pages/Categories";
@@ -81,7 +82,7 @@ function App() {
                       element={<Navigate to="/admin/dashboard" replace />}
                     />
                     <Route path="dashboard" element={<AdminDashboard />} />
-                    <Route path="analytics" element={<AdminDashboard />} />
+                    <Route path="analytics" element={<AdminAnalytics />} />
                     <Route path="products" element={<AdminProducts />} />
                     <Route path="products/new" element={<ProductForm />} />
                     <Route path="products/edit/:id" element={<ProductForm />} />
