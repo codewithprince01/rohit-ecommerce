@@ -64,20 +64,20 @@ const CategoryFormModal = ({ isOpen, onClose, category, parentCategory, onSave, 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Category Name</label>
-          <input type="text" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="w-full mt-1 px-4 py-2 border border-gray-100 rounded-lg text-sm font-semibold focus:border-primary-300 outline-none" placeholder="E.G. Fresh Vegetables" />
+          <input type="text" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="w-full mt-1 px-4 py-2 bg-white dark:bg-gray-700 border border-gray-100 dark:border-gray-600 rounded-lg text-sm font-semibold text-gray-900 dark:text-gray-100 focus:border-primary-300 outline-none" placeholder="E.G. Fresh Vegetables" />
         </div>
 
         <div>
            <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Parent Category</label>
-           <select value={formData.parent} onChange={(e) => setFormData({ ...formData, parent: e.target.value })} className="w-full mt-1 px-4 py-2 border border-gray-100 rounded-lg text-sm bg-white focus:border-primary-300 outline-none">
-              <option value="">None (Root Category)</option>
-              {categories.map(cat => <option key={cat._id} value={cat._id}>{cat.name}</option>)}
-           </select>
+            <select value={formData.parent} onChange={(e) => setFormData({ ...formData, parent: e.target.value })} className="w-full mt-1 px-4 py-2 bg-white dark:bg-gray-700 border border-gray-100 dark:border-gray-600 rounded-lg text-sm text-gray-900 dark:text-gray-100 focus:border-primary-300 outline-none">
+               <option value="" className="bg-white dark:bg-gray-800">None (Root Category)</option>
+               {categories.map(cat => <option key={cat._id} value={cat._id} className="bg-white dark:bg-gray-800">{cat.name}</option>)}
+            </select>
         </div>
 
         <div>
           <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Brief Description</label>
-          <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows={2} className="w-full mt-1 px-4 py-2 border border-gray-100 rounded-lg text-sm resize-none focus:border-primary-300 outline-none" />
+          <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows={2} className="w-full mt-1 px-4 py-2 bg-white dark:bg-gray-700 border border-gray-100 dark:border-gray-600 rounded-lg text-sm text-gray-900 dark:text-gray-100 resize-none focus:border-primary-300 outline-none" />
         </div>
 
         <div className="grid grid-cols-2 gap-4">
@@ -87,10 +87,10 @@ const CategoryFormModal = ({ isOpen, onClose, category, parentCategory, onSave, 
            </div>
            <div>
               <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Status</label>
-              <select value={formData.isActive.toString()} onChange={(e) => setFormData({ ...formData, isActive: e.target.value === "true" })} className="w-full mt-1 px-4 py-2 border border-gray-100 rounded-lg text-sm bg-white">
-                 <option value="true">Active</option>
-                 <option value="false">Hidden</option>
-              </select>
+               <select value={formData.isActive.toString()} onChange={(e) => setFormData({ ...formData, isActive: e.target.value === "true" })} className="w-full mt-1 px-4 py-2 bg-white dark:bg-gray-700 border border-gray-100 dark:border-gray-600 rounded-lg text-sm text-gray-900 dark:text-gray-100">
+                  <option value="true" className="bg-white dark:bg-gray-800">Active</option>
+                  <option value="false" className="bg-white dark:bg-gray-800">Hidden</option>
+               </select>
            </div>
         </div>
 
@@ -110,8 +110,8 @@ const CategoryItem = ({ category, level = 0, onEdit, onDelete, onAddChild }) => 
   const hasChildren = category.children && category.children.length > 0;
 
   return (
-    <div className="border-b last:border-0 border-gray-50">
-      <div className={`flex items-center gap-4 px-4 py-3 hover:bg-gray-50 transition-all ${level > 0 ? "bg-gray-50/30" : ""}`} style={{ paddingLeft: `${level * 24 + 16}px` }}>
+    <div className="border-b last:border-0 border-gray-50 dark:border-gray-700">
+      <div className={`flex items-center gap-4 px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all ${level > 0 ? "bg-gray-50/30 dark:bg-gray-900/10" : ""}`} style={{ paddingLeft: `${level * 24 + 16}px` }}>
         <button onClick={() => setExpanded(!expanded)} className={`p-1 rounded hover:bg-white text-gray-400 ${!hasChildren && "invisible"}`}>
            {expanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
         </button>
@@ -121,8 +121,8 @@ const CategoryItem = ({ category, level = 0, onEdit, onDelete, onAddChild }) => 
         </div>
 
         <div className="flex-1">
-           <p className="text-sm font-bold text-gray-900">{category.name}</p>
-           <p className="text-[10px] text-gray-400 font-medium">{category.productCount || 0} Products</p>
+           <p className="text-sm font-bold text-gray-900 dark:text-gray-100">{category.name}</p>
+           <p className="text-[10px] text-gray-400 dark:text-gray-500 font-medium">{category.productCount || 0} Products</p>
         </div>
 
         <div className="flex items-center gap-1">
@@ -188,14 +188,14 @@ const Categories = () => {
       <div className="bg-white dark:bg-gray-800 p-2 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm flex items-center">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
-          <input type="text" placeholder="Search categories..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-full pl-10 pr-4 py-2 bg-transparent text-sm font-medium outline-none" />
+          <input type="text" placeholder="Search categories..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-full pl-10 pr-4 py-2 bg-transparent text-sm font-bold text-gray-900 dark:text-gray-100 outline-none placeholder:text-gray-400" />
         </div>
       </div>
 
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
-        <div className="p-4 border-b border-gray-50"><h3 className="text-xs font-black text-gray-400 uppercase tracking-widest">Active Tree</h3></div>
+        <div className="p-4 border-b border-gray-50 dark:border-gray-700"><h3 className="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Active Tree</h3></div>
         {loading ? <div className="p-12 text-center"><LoadingSpinner /></div> : (
-          <div className="divide-y divide-gray-50">
+          <div className="divide-y divide-gray-50 dark:divide-gray-700">
             {categories.map(cat => <CategoryItem key={cat._id} category={cat} onEdit={(c) => setFormModal({ isOpen: true, category: c })} onDelete={(c) => setDeleteModal({ isOpen: true, category: c })} onAddChild={(p) => setFormModal({ isOpen: true, parent: p })} />)}
           </div>
         )}

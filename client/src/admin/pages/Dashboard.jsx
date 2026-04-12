@@ -337,19 +337,19 @@ const Dashboard = () => {
                 {data.recentOrders.map((order) => (
                   <tr key={order._id} className="hover:bg-gray-50/50 transition-colors">
                     <td className="px-8 py-5 border-transparent">
-                      <span className="text-sm font-black text-gray-900">#{order.orderNumber}</span>
-                      <p className="text-[10px] text-gray-400 mt-0.5">{new Date(order.createdAt).toLocaleDateString()}</p>
+                      <span className="text-sm font-black text-gray-900 dark:text-gray-100">#{order.orderNumber}</span>
+                      <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">{new Date(order.createdAt).toLocaleDateString()}</p>
                     </td>
                     <td className="px-8 py-5">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center text-[10px] font-black text-gray-500 border border-gray-200">
+                        <div className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-[10px] font-black text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700">
                           {order.customerName?.charAt(0) || "U"}
                         </div>
-                        <span className="text-sm font-bold text-gray-700">{order.customerName || "Customer"}</span>
+                        <span className="text-sm font-bold text-gray-700 dark:text-gray-300">{order.customerName || "Customer"}</span>
                       </div>
                     </td>
                     <td className="px-8 py-5">
-                      <span className="text-sm font-black text-gray-900">₹{order.grandTotal.toLocaleString()}</span>
+                      <span className="text-sm font-black text-gray-900 dark:text-gray-100">₹{order.grandTotal.toLocaleString()}</span>
                     </td>
                     <td className="px-8 py-5">
                       <span className={`text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-tighter ${

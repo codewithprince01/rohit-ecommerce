@@ -291,21 +291,16 @@ export const DataTable = ({
   };
 
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full">
-        <thead className="bg-gray-50 dark:bg-gray-700/50">
-          <tr>
+    <div className="w-full overflow-x-auto custom-scrollbar">
+      <table className="w-full text-left border-collapse min-w-[600px]">
+        <thead>
+          <tr className="bg-gray-50/50 dark:bg-gray-900/50 border-b border-gray-100 dark:border-gray-700">
             {selectable && (
-              <th className="px-4 py-4 w-12">
+              <th className="px-6 py-4 w-10">
                 <input
                   type="checkbox"
-                  className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
-                  checked={
-                    data.length > 0 &&
-                    data.every((item) =>
-                      selectedRows.includes(item._id || item.id),
-                    )
-                  }
+                  className="rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500 bg-white dark:bg-gray-800"
+                  checked={selectedRows.length === data.length && data.length > 0}
                   onChange={handleSelectAll}
                 />
               </th>
@@ -313,14 +308,14 @@ export const DataTable = ({
             {columns.map((column, idx) => (
               <th
                 key={idx}
-                className={`px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider ${column.align === "right" ? "text-right" : "text-left"}`}
+                className={`px-6 py-4 text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest ${column.align === "right" ? "text-right" : ""}`}
               >
                 {column.header}
               </th>
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
+        <tbody className="divide-y divide-gray-50 dark:divide-gray-700">
           {loading ? (
             [...Array(5)].map((_, i) => (
               <tr key={i} className="animate-pulse">
@@ -359,7 +354,7 @@ export const DataTable = ({
                 {columns.map((column, colIdx) => (
                   <td
                     key={colIdx}
-                    className={`px-6 py-4 ${column.align === "right" ? "text-right" : ""}`}
+                    className={`px-6 py-4 text-sm font-medium text-gray-700 dark:text-gray-200 ${column.align === "right" ? "text-right" : ""}`}
                   >
                     {column.render ? column.render(row) : row[column.accessor]}
                   </td>
@@ -370,7 +365,7 @@ export const DataTable = ({
             <tr>
               <td
                 colSpan={columns.length + (selectable ? 1 : 0)}
-                className="px-6 py-12 text-center text-gray-500"
+                className="px-6 py-12 text-center text-gray-500 dark:text-gray-400"
               >
                 {emptyMessage}
               </td>
@@ -518,26 +513,26 @@ export const EmptyState = ({ icon: Icon, title, description, action }) => (
 // ============================================
 // CARD COMPONENT
 // ============================================
-export const Card = ({ children, className = "", padding = true }) => (
-  <div
-    className={`bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 ${padding ? "p-6" : ""} ${className}`}
-  >
-    {children}
-  </div>
-);
-
-export const CardHeader = ({ title, subtitle, action }) => (
-  <div className="flex items-center justify-between mb-6">
-    <div>
-      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-        {title}
-      </h3>
-      {subtitle && (
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-          {subtitle}
-        </p>
+export const Card = ({ children, className = "", title, subtitle }) => {
+  return (
+    <div
+      className={`bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden ${className}`}
+    >
+      {(title || subtitle) && (
+        <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700">
+          {title && (
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+              {title}
+            </h3>
+          )}
+          {subtitle && (
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              {subtitle}
+            </p>
+          )}
+        </div>
       )}
+      <div className="p-6 text-gray-700 dark:text-gray-200">{children}</div>
     </div>
-    {action}
-  </div>
-);
+  );
+};

@@ -85,7 +85,7 @@ const Products = () => {
       ),
     },
     { header: "Department", render: (p) => <span className="text-xs font-bold text-gray-500 uppercase">{p.category?.name || "Unclassified"}</span> },
-    { header: "Pricing", render: (p) => <span className="font-black text-gray-900">₹{p.price?.toLocaleString()}</span> },
+    { header: "Pricing", render: (p) => <span className="font-black text-gray-900 dark:text-gray-100">₹{p.price?.toLocaleString()}</span> },
     { 
       header: "Availability", 
       render: (p) => (
@@ -123,12 +123,12 @@ const Products = () => {
       <div className="flex flex-col lg:flex-row items-center gap-4 bg-white dark:bg-gray-800 p-2 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm">
         <div className="relative flex-1 w-full">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
-          <input type="text" placeholder="Search by name, SKU or tags..." value={search} onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }} className="w-full pl-10 pr-4 py-2 bg-transparent text-sm font-medium outline-none" />
+          <input type="text" placeholder="Search by name, SKU or tags..." value={search} onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }} className="w-full pl-10 pr-4 py-2 bg-transparent text-sm font-bold text-gray-900 dark:text-gray-100 outline-none placeholder:text-gray-400" />
         </div>
         <div className="flex items-center gap-2 w-full lg:w-auto border-t lg:border-t-0 pt-2 lg:pt-0">
            <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)} className="flex-1 lg:min-w-[160px] px-3 py-2 bg-gray-50 dark:bg-gray-700 rounded-lg text-xs font-bold uppercase tracking-wider outline-none">
-              <option value="">All Regions</option>
-              {categories.map(c => <option key={c._id} value={c._id}>{c.name}</option>)}
+               <option value="" className="bg-white dark:bg-gray-800">All Regions</option>
+               {categories.map(c => <option key={c._id} value={c._id} className="bg-white dark:bg-gray-800">{c.name}</option>)}
            </select>
            <select value={selectedStatus} onChange={(e) => setSelectedStatus(e.target.value)} className="flex-1 lg:min-w-[120px] px-3 py-2 bg-gray-50 dark:bg-gray-700 rounded-lg text-xs font-bold uppercase tracking-wider outline-none">
               <option value="">Status</option>

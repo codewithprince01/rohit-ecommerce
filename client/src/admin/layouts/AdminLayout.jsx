@@ -30,11 +30,24 @@ const AdminLayout = () => {
   const { logout, user } = useAuth();
   const [isSidebarOpen, setSidebarOpen] = useState(true);
   const [isSidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [isDarkMode, setDarkMode] = useState(false);
+  const [isDarkMode, setDarkMode] = useState(() => {
+    return localStorage.getItem('admin-theme') === 'dark';
+  });
   const [showNotifications, setShowNotifications] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+
+  // Unified theme sync
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('admin-theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('admin-theme', 'light');
+    }
+  }, [isDarkMode]);
 
   // Menu items organized by sections
   const menuSections = [
@@ -119,7 +132,6 @@ const AdminLayout = () => {
 
   const toggleDarkMode = () => {
     setDarkMode(!isDarkMode);
-    document.documentElement.classList.toggle("dark");
   };
 
   // Close dropdowns when clicking outside
@@ -135,7 +147,7 @@ const AdminLayout = () => {
 
   return (
     <div
-      className={`min-h-screen flex ${isDarkMode ? "dark bg-gray-900" : "bg-gray-50"}`}
+      className={`min-h-screen flex ${isDarkMode ? "dark bg-gray-950 text-gray-100" : "bg-gray-50 text-gray-900"}`}
     >
       {/* Sidebar */}
       <aside
@@ -180,7 +192,7 @@ const AdminLayout = () => {
                 <input
                   type="text"
                   placeholder="Search..."
-                  className="w-full pl-10 pr-4 py-2.5 bg-gray-100 dark:bg-gray-700 border-0 rounded-xl text-sm text-gray-700 dark:text-gray-200 placeholder-gray-400 focus:ring-2 focus:ring-primary-500 focus:bg-white dark:focus:bg-gray-600 transition-all"
+                  className="w-full pl-10 pr-4 py-2.5 bg-gray-100 dark:bg-gray-700 border-0 rounded-xl text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:ring-2 focus:ring-primary-500 focus:bg-white dark:focus:bg-gray-600 transition-all outline-none"
                 />
               </div>
             </div>
@@ -342,9 +354,11 @@ const AdminLayout = () => {
             {/* Dark Mode Toggle */}
             <button
               onClick={toggleDarkMode}
-              className="p-2.5 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-colors"
+              className="p-2.5 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-all border border-gray-100 dark:border-gray-700 shadow-sm flex items-center gap-2 active:scale-90"
+              title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
             >
-              {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
+              {isDarkMode ? <Sun size={20} className="text-amber-500" /> : <Moon size={20} className="text-gray-600" />}
+              <span className="text-[10px] font-black uppercase hidden sm:block tracking-widest">{isDarkMode ? 'Light' : 'Dark'}</span>
             </button>
 
             {/* Notifications */}

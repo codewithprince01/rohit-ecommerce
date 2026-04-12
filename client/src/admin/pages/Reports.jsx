@@ -55,16 +55,16 @@ const Reports = () => {
   })) : [];
 
   const productColumns = [
-    { header: "Product Name", render: (p) => <span className="text-sm font-bold">{p.name}</span> },
-    { header: "Units Sold", render: (p) => <span className="font-bold">{p.soldCount}</span> },
+    { header: "Product Name", render: (p) => <span className="text-sm font-bold text-gray-900 dark:text-gray-100">{p.name}</span> },
+    { header: "Units Sold", render: (p) => <span className="font-bold text-gray-700 dark:text-gray-300">{p.soldCount}</span> },
     { header: "Total Revenue", render: (p) => <span className="font-bold text-primary-600">₹{p.revenue?.toLocaleString()}</span> },
   ];
 
   const customerColumns = [
-    { header: "Customer", render: (c) => <div className="flex flex-col"><span className="text-sm font-bold">{c.name}</span><span className="text-[10px] text-gray-400">{c.email}</span></div> },
-    { header: "Orders", render: (c) => <span className="font-bold">{c.orderCount}</span> },
+    { header: "Customer", render: (c) => <div className="flex flex-col"><span className="text-sm font-bold text-gray-900 dark:text-gray-100">{c.name}</span><span className="text-[10px] text-gray-400 dark:text-gray-500">{c.email}</span></div> },
+    { header: "Orders", render: (c) => <span className="font-bold text-gray-700 dark:text-gray-300">{c.orderCount}</span> },
     { header: "Total Spent", render: (c) => <span className="font-bold text-primary-600">₹{c.totalSpent?.toLocaleString()}</span> },
-    { header: "Last Activity", render: (c) => <span className="text-xs text-gray-500">{c.lastOrderDate ? new Date(c.lastOrderDate).toLocaleDateString() : "Never"}</span> },
+    { header: "Last Activity", render: (c) => <span className="text-xs text-gray-500 dark:text-gray-400">{c.lastOrderDate ? new Date(c.lastOrderDate).toLocaleDateString() : "Never"}</span> },
   ];
 
   return (

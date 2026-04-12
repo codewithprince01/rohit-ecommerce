@@ -189,11 +189,11 @@ const AdminSettings = () => {
               <div className="space-y-4">
                  <div className="space-y-1">
                     <label className="text-[10px] font-bold text-gray-500 uppercase">WhatsApp Number</label>
-                    <input type="text" name="whatsappNumber" value={formData.whatsappNumber} onChange={handleChange} placeholder="+91 9999999999" className="w-full px-4 py-2 border border-gray-100 rounded-lg text-sm font-bold focus:border-primary-300 outline-none" />
+                    <input type="text" name="whatsappNumber" value={formData.whatsappNumber} onChange={handleChange} placeholder="+91 9999999999" className="w-full px-4 py-2 bg-white dark:bg-gray-700 border border-gray-100 dark:border-gray-600 rounded-lg text-sm font-bold text-gray-900 dark:text-gray-100 focus:border-primary-300 outline-none" />
                  </div>
                  <div className="space-y-1">
                     <label className="text-[10px] font-bold text-gray-500 uppercase">Default Order Message</label>
-                    <textarea name="whatsappMessage" value={formData.whatsappMessage} onChange={handleChange} rows={2} className="w-full px-4 py-2 border border-gray-100 rounded-lg text-sm resize-none focus:border-primary-300 outline-none" />
+                    <textarea name="whatsappMessage" value={formData.whatsappMessage} onChange={handleChange} rows={2} className="w-full px-4 py-2 bg-white dark:bg-gray-700 border border-gray-100 dark:border-gray-600 rounded-lg text-sm text-gray-900 dark:text-gray-100 resize-none focus:border-primary-300 outline-none" />
                  </div>
               </div>
            </div>
