@@ -233,10 +233,10 @@ const Orders = () => {
       header: "Customer",
       render: (order) => (
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-xs font-bold text-primary-600">
+          <div className="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-xs font-bold text-primary-600">
             {order.customerName?.charAt(0)}
           </div>
-          <span className="text-sm font-semibold">{order.customerName}</span>
+          <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">{order.customerName}</span>
         </div>
       ),
     },
@@ -298,7 +298,7 @@ const Orders = () => {
             placeholder="Search by order ID or customer..."
             value={searchQuery}
             onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
-            className="w-full pl-10 pr-4 py-2 bg-transparent text-sm font-medium focus:ring-0 outline-none"
+            className="w-full pl-10 pr-4 py-2 bg-transparent text-sm font-bold text-gray-900 dark:text-gray-100 focus:ring-0 outline-none placeholder:text-gray-400"
           />
         </div>
       </div>

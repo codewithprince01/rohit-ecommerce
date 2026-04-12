@@ -109,11 +109,11 @@ const SupplierFormModal = ({ isOpen, onClose, supplier, onSave }) => {
              <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest border-b pb-2">Business Identity</h4>
              <div>
                <label className="text-xs font-bold text-gray-500 uppercase">Company Name</label>
-               <input type="text" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} className="w-full mt-1 px-4 py-2 border border-gray-200 rounded-lg text-sm font-semibold" placeholder="E.G. Green Valley Farms" />
+               <input type="text" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} className="w-full mt-1 px-4 py-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-sm font-semibold text-gray-900 dark:text-gray-100 placeholder-gray-400 outline-none focus:border-primary-300" placeholder="E.G. Green Valley Farms" />
              </div>
              <div>
                <label className="text-xs font-bold text-gray-500 uppercase">Vendor Type</label>
-               <select value={formData.type} onChange={(e) => setFormData({...formData, type: e.target.value})} className="w-full mt-1 px-4 py-2 border border-gray-200 rounded-lg text-sm bg-white">
+               <select value={formData.type} onChange={(e) => setFormData({...formData, type: e.target.value})} className="w-full mt-1 px-4 py-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-sm text-gray-900 dark:text-gray-100 focus:border-primary-300 outline-none bg-white">
                  <option value="distributor">Distributor</option>
                  <option value="wholesaler">Wholesaler</option>
                  <option value="manufacturer">Manufacturer</option>
@@ -127,16 +127,16 @@ const SupplierFormModal = ({ isOpen, onClose, supplier, onSave }) => {
              <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest border-b pb-2">Key Account Manager</h4>
              <div>
                <label className="text-xs font-bold text-gray-500 uppercase">Contact Name</label>
-               <input type="text" value={formData.contact.primary.name} onChange={(e) => setFormData({...formData, contact: { primary: { ...formData.contact.primary, name: e.target.value }}})} className="w-full mt-1 px-4 py-2 border border-gray-200 rounded-lg text-sm font-semibold" placeholder="E.G. Rajesh Kumar" />
+               <input type="text" value={formData.contact.primary.name} onChange={(e) => setFormData({...formData, contact: { primary: { ...formData.contact.primary, name: e.target.value }}})} className="w-full mt-1 px-4 py-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-sm font-semibold text-gray-900 dark:text-gray-100 placeholder-gray-400 outline-none focus:border-primary-300" placeholder="E.G. Rajesh Kumar" />
              </div>
              <div className="grid grid-cols-2 gap-2">
                 <div>
                   <label className="text-xs font-bold text-gray-500 uppercase">Phone</label>
-                  <input type="text" value={formData.contact.primary.phone} onChange={(e) => setFormData({...formData, contact: { primary: { ...formData.contact.primary, phone: e.target.value }}})} className="w-full mt-1 px-4 py-2 border border-gray-200 rounded-lg text-sm" placeholder="9876543210" />
+                  <input type="text" value={formData.contact.primary.phone} onChange={(e) => setFormData({...formData, contact: { primary: { ...formData.contact.primary, phone: e.target.value }}})} className="w-full mt-1 px-4 py-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-sm text-gray-900 dark:text-gray-100 focus:border-primary-300 outline-none" placeholder="9876543210" />
                 </div>
                 <div>
                   <label className="text-xs font-bold text-gray-500 uppercase">Email</label>
-                  <input type="email" value={formData.contact.primary.email} onChange={(e) => setFormData({...formData, contact: { primary: { ...formData.contact.primary, email: e.target.value }}})} className="w-full mt-1 px-4 py-2 border border-gray-200 rounded-lg text-sm" placeholder="vendor@email.com" />
+                  <input type="email" value={formData.contact.primary.email} onChange={(e) => setFormData({...formData, contact: { primary: { ...formData.contact.primary, email: e.target.value }}})} className="w-full mt-1 px-4 py-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-sm text-gray-900 dark:text-gray-100 focus:border-primary-300 outline-none" placeholder="vendor@email.com" />
                 </div>
              </div>
           </div>
@@ -147,23 +147,23 @@ const SupplierFormModal = ({ isOpen, onClose, supplier, onSave }) => {
              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="md:col-span-2">
                   <label className="text-xs font-bold text-gray-500 uppercase">Street Address</label>
-                  <input type="text" value={formData.address.billing.street} onChange={(e) => setFormData({...formData, address: { billing: { ...formData.address.billing, street: e.target.value }}})} className="w-full mt-1 px-4 py-2 border border-gray-200 rounded-lg text-sm" />
+                  <input type="text" value={formData.address.billing.street} onChange={(e) => setFormData({...formData, address: { billing: { ...formData.address.billing, street: e.target.value }}})} className="w-full mt-1 px-4 py-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-sm text-gray-900 dark:text-gray-100 focus:border-primary-300 outline-none" />
                 </div>
                 <div>
                   <label className="text-xs font-bold text-gray-500 uppercase">City</label>
-                  <input type="text" value={formData.address.billing.city} onChange={(e) => setFormData({...formData, address: { billing: { ...formData.address.billing, city: e.target.value }}})} className="w-full mt-1 px-4 py-2 border border-gray-200 rounded-lg text-sm" />
+                  <input type="text" value={formData.address.billing.city} onChange={(e) => setFormData({...formData, address: { billing: { ...formData.address.billing, city: e.target.value }}})} className="w-full mt-1 px-4 py-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-sm text-gray-900 dark:text-gray-100 focus:border-primary-300 outline-none" />
                 </div>
                 <div>
                   <label className="text-xs font-bold text-gray-500 uppercase">State</label>
-                  <input type="text" value={formData.address.billing.state} onChange={(e) => setFormData({...formData, address: { billing: { ...formData.address.billing, state: e.target.value }}})} className="w-full mt-1 px-4 py-2 border border-gray-200 rounded-lg text-sm" />
+                  <input type="text" value={formData.address.billing.state} onChange={(e) => setFormData({...formData, address: { billing: { ...formData.address.billing, state: e.target.value }}})} className="w-full mt-1 px-4 py-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-sm text-gray-900 dark:text-gray-100 focus:border-primary-300 outline-none" />
                 </div>
                 <div>
                   <label className="text-xs font-bold text-gray-500 uppercase">Pincode</label>
-                  <input type="text" value={formData.address.billing.postalCode} onChange={(e) => setFormData({...formData, address: { billing: { ...formData.address.billing, postalCode: e.target.value }}})} className="w-full mt-1 px-4 py-2 border border-gray-200 rounded-lg text-sm" />
+                  <input type="text" value={formData.address.billing.postalCode} onChange={(e) => setFormData({...formData, address: { billing: { ...formData.address.billing, postalCode: e.target.value }}})} className="w-full mt-1 px-4 py-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-sm text-gray-900 dark:text-gray-100 focus:border-primary-300 outline-none" />
                 </div>
                 <div>
                   <label className="text-xs font-bold text-gray-500 uppercase">Status</label>
-                  <select value={formData.status} onChange={(e) => setFormData({...formData, status: e.target.value, isActive: e.target.value === 'active'})} className="w-full mt-1 px-4 py-2 border border-gray-200 rounded-lg text-sm bg-white">
+                  <select value={formData.status} onChange={(e) => setFormData({...formData, status: e.target.value, isActive: e.target.value === 'active'})} className="w-full mt-1 px-4 py-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-sm text-gray-900 dark:text-gray-100 focus:border-primary-300 outline-none bg-white">
                     <option value="active">Active</option>
                     <option value="inactive">Inactive</option>
                     <option value="suspended">Suspended</option>
@@ -251,8 +251,8 @@ const Suppliers = () => {
              <Building size={20} />
           </div>
           <div className="min-w-0">
-             <p className="text-sm font-bold text-gray-900 truncate">{supplier.name}</p>
-             <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tight">{supplier.code}</p>
+             <p className="text-sm font-bold text-gray-900 dark:text-gray-100 truncate">{supplier.name}</p>
+             <p className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-tight">{supplier.code}</p>
           </div>
         </div>
       ),
@@ -319,7 +319,7 @@ const Suppliers = () => {
       <div className="flex flex-col lg:flex-row items-center gap-4 bg-white dark:bg-gray-800 p-2 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm">
         <div className="relative flex-1 w-full">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
-          <input type="text" placeholder="Search partners by name, code or city..." value={searchQuery} onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }} className="w-full pl-10 pr-4 py-2 bg-transparent text-sm font-medium outline-none" />
+          <input type="text" placeholder="Search partners by name, code or city..." value={searchQuery} onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }} className="w-full pl-10 pr-4 py-2 bg-transparent text-sm font-black text-gray-900 dark:text-gray-100 outline-none placeholder:text-gray-400" />
         </div>
       </div>
 

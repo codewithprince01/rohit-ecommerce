@@ -207,23 +207,23 @@ const AdminSettings = () => {
            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-1">
                  <label className="text-[10px] font-bold text-gray-500 uppercase">Official Business Name</label>
-                 <input type="text" name="storeName" value={formData.storeName} onChange={handleChange} className="w-full px-4 py-2 border border-gray-100 rounded-lg text-sm font-semibold focus:border-primary-300 outline-none" />
+                 <input type="text" name="storeName" value={formData.storeName} onChange={handleChange} className="w-full px-4 py-2 bg-white dark:bg-gray-700 border border-gray-100 dark:border-gray-600 rounded-lg text-sm font-semibold text-gray-900 dark:text-gray-100 focus:border-primary-300 outline-none" />
               </div>
               <div className="space-y-1">
                  <label className="text-[10px] font-bold text-gray-500 uppercase">Customer Support Email</label>
-                 <input type="email" name="storeEmail" value={formData.storeEmail} onChange={handleChange} className="w-full px-4 py-2 border border-gray-100 rounded-lg text-sm focus:border-primary-300 outline-none" />
+                 <input type="email" name="storeEmail" value={formData.storeEmail} onChange={handleChange} className="w-full px-4 py-2 bg-white dark:bg-gray-700 border border-gray-100 dark:border-gray-600 rounded-lg text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:border-primary-300 outline-none transition-all" />
               </div>
               <div className="space-y-1">
                  <label className="text-[10px] font-bold text-gray-500 uppercase">Support Phone</label>
-                 <input type="tel" name="storePhone" value={formData.storePhone} onChange={handleChange} className="w-full px-4 py-2 border border-gray-100 rounded-lg text-sm focus:border-primary-300 outline-none" />
+                 <input type="tel" name="storePhone" value={formData.storePhone} onChange={handleChange} className="w-full px-4 py-2 bg-white dark:bg-gray-700 border border-gray-100 dark:border-gray-600 rounded-lg text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:border-primary-300 outline-none transition-all" />
               </div>
               <div className="space-y-1">
                  <label className="text-[10px] font-bold text-gray-500 uppercase">Working Hours</label>
-                 <input type="text" name="businessHours" value={formData.businessHours} onChange={handleChange} className="w-full px-4 py-2 border border-gray-100 rounded-lg text-sm focus:border-primary-300 outline-none" />
+                 <input type="text" name="businessHours" value={formData.businessHours} onChange={handleChange} className="w-full px-4 py-2 bg-white dark:bg-gray-700 border border-gray-100 dark:border-gray-600 rounded-lg text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:border-primary-300 outline-none transition-all" />
               </div>
               <div className="md:col-span-2 space-y-1">
                  <label className="text-[10px] font-bold text-gray-500 uppercase">Official Terms & Store Description</label>
-                 <textarea name="storeDescription" value={formData.storeDescription} onChange={handleChange} rows={3} className="w-full px-4 py-2 border border-gray-100 rounded-lg text-sm focus:border-primary-300 outline-none" />
+                 <textarea name="storeDescription" value={formData.storeDescription} onChange={handleChange} rows={3} className="w-full px-4 py-2 bg-white dark:bg-gray-700 border border-gray-100 dark:border-gray-600 rounded-lg text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:border-primary-300 outline-none transition-all" />
               </div>
            </div>
         </div>
@@ -236,15 +236,15 @@ const AdminSettings = () => {
            <div className="space-y-4">
               <div className="space-y-1">
                  <label className="text-[10px] font-bold text-gray-500 uppercase">Search Browser Title</label>
-                 <input type="text" name="seo.metaTitle" value={formData.seo?.metaTitle || ''} onChange={handleChange} className="w-full px-4 py-2 border border-gray-100 rounded-lg text-sm font-bold" />
+                 <input type="text" name="seo.metaTitle" value={formData.seo?.metaTitle || ''} onChange={handleChange} className="w-full px-4 py-2 bg-white dark:bg-gray-700 border border-gray-100 dark:border-gray-600 rounded-lg text-sm font-bold text-gray-900 dark:text-gray-100" />
               </div>
               <div className="space-y-1">
                  <label className="text-[10px] font-bold text-gray-500 uppercase">Meta Keywords (Comma separated)</label>
-                 <input type="text" name="seo.metaKeywords" value={formData.seo?.metaKeywords || ''} onChange={handleChange} className="w-full px-4 py-2 border border-gray-100 rounded-lg text-sm" />
+                 <input type="text" name="seo.metaKeywords" value={formData.seo?.metaKeywords || ''} onChange={handleChange} className="w-full px-4 py-2 bg-white dark:bg-gray-700 border border-gray-100 dark:border-gray-600 rounded-lg text-sm text-gray-900 dark:text-gray-100" />
               </div>
               <div className="space-y-1">
                  <label className="text-[10px] font-bold text-gray-500 uppercase">Search Description</label>
-                 <textarea name="seo.metaDescription" value={formData.seo?.metaDescription || ''} onChange={handleChange} rows={2} className="w-full px-4 py-2 border border-gray-100 rounded-lg text-sm resize-none" />
+                 <textarea name="seo.metaDescription" value={formData.seo?.metaDescription || ''} onChange={handleChange} rows={2} className="w-full px-4 py-2 bg-white dark:bg-gray-700 border border-gray-100 dark:border-gray-600 rounded-lg text-sm text-gray-900 dark:text-gray-100 resize-none" />
               </div>
            </div>
         </div>
@@ -257,15 +257,15 @@ const AdminSettings = () => {
            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="space-y-1">
                  <label className="text-[10px] font-bold text-gray-500 uppercase">Instagram URL</label>
-                 <input type="text" name="socialMedia.instagram" value={formData.socialMedia?.instagram || ''} onChange={handleChange} className="w-full px-4 py-2 border border-gray-100 rounded-lg text-sm" />
+                 <input type="text" name="socialMedia.instagram" value={formData.socialMedia?.instagram || ''} onChange={handleChange} className="w-full px-4 py-2 bg-white dark:bg-gray-700 border border-gray-100 dark:border-gray-600 rounded-lg text-sm text-gray-900 dark:text-gray-100" />
               </div>
               <div className="space-y-1">
                  <label className="text-[10px] font-bold text-gray-500 uppercase">Facebook URL</label>
-                 <input type="text" name="socialMedia.facebook" value={formData.socialMedia?.facebook || ''} onChange={handleChange} className="w-full px-4 py-2 border border-gray-100 rounded-lg text-sm" />
+                 <input type="text" name="socialMedia.facebook" value={formData.socialMedia?.facebook || ''} onChange={handleChange} className="w-full px-4 py-2 bg-white dark:bg-gray-700 border border-gray-100 dark:border-gray-600 rounded-lg text-sm text-gray-900 dark:text-gray-100" />
               </div>
               <div className="space-y-1">
                  <label className="text-[10px] font-bold text-gray-500 uppercase">X (Twitter) URL</label>
-                 <input type="text" name="socialMedia.twitter" value={formData.socialMedia?.twitter || ''} onChange={handleChange} className="w-full px-4 py-2 border border-gray-100 rounded-lg text-sm" />
+                 <input type="text" name="socialMedia.twitter" value={formData.socialMedia?.twitter || ''} onChange={handleChange} className="w-full px-4 py-2 bg-white dark:bg-gray-700 border border-gray-100 dark:border-gray-600 rounded-lg text-sm text-gray-900 dark:text-gray-100" />
               </div>
            </div>
         </div>
