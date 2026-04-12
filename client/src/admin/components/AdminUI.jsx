@@ -102,6 +102,14 @@ export const StatusBadge = ({ status, size = "md" }) => {
       color: "bg-slate-100 text-slate-700 border-slate-200",
       label: "Draft",
     },
+    unread: {
+      color: "bg-red-50 text-red-600 border-red-100",
+      label: "Unread",
+    },
+    archived: {
+      color: "bg-gray-100 text-gray-500 border-gray-200",
+      label: "Archived",
+    },
 
     // Default
     default: {

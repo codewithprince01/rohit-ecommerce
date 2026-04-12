@@ -37,6 +37,7 @@ import AdminSettings from "./admin/pages/Settings";
 import AdminMessages from "./admin/pages/Messages";
 import AdminSuppliers from "./admin/pages/Suppliers";
 import AdminReports from "./admin/pages/Reports";
+import AdminUsers from "./admin/pages/Users";
 import AdminLogin from "./admin/pages/Login";
 
 function App() {
@@ -97,14 +98,7 @@ function App() {
                     <Route path="suppliers" element={<AdminSuppliers />} />
                     <Route path="reports" element={<AdminReports />} />
                     <Route path="settings" element={<AdminSettings />} />
-                    <Route
-                      path="users"
-                      element={
-                        <div className="text-center py-12 text-gray-500">
-                          Admin Users - Coming Soon
-                        </div>
-                      }
-                    />
+                    <Route path="users" element={<AdminUsers />} />
                     <Route path="messages" element={<AdminMessages />} />
                   </Route>
                 </Route>

@@ -116,7 +116,7 @@ const AdminUsers = () => {
         const Icon = config.icon;
         return (
           <div className={`flex items-center w-fit gap-1.5 px-2.5 py-1 rounded-full border text-[10px] font-black uppercase tracking-tighter ${config.color}`}>
-            <Icon size={12} /> {u.role.replace('_', ' ')}
+            <Icon size={12} /> {(u.role || 'user').replace('_', ' ')}
           </div>
         );
       }
