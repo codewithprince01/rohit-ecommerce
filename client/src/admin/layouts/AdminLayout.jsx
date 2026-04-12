@@ -147,7 +147,7 @@ const AdminLayout = () => {
           {/* Logo */}
           <div className="h-16 flex items-center justify-between px-4 border-b border-gray-200 dark:border-gray-700">
             <Link to="/admin/dashboard" className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/30">
+              <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center shadow-lg shadow-primary-500/30">
                 <span className="text-white font-bold text-xl">A</span>
               </div>
               {!isSidebarCollapsed && (
@@ -155,7 +155,7 @@ const AdminLayout = () => {
                   <span className="text-lg font-bold text-gray-900 dark:text-white">
                     Agrawal
                   </span>
-                  <span className="text-[10px] text-indigo-600 font-semibold tracking-widest uppercase">
+                  <span className="text-[10px] text-primary-600 font-semibold tracking-widest uppercase">
                     Admin Panel
                   </span>
                 </div>
@@ -180,7 +180,7 @@ const AdminLayout = () => {
                 <input
                   type="text"
                   placeholder="Search..."
-                  className="w-full pl-10 pr-4 py-2.5 bg-gray-100 dark:bg-gray-700 border-0 rounded-xl text-sm text-gray-700 dark:text-gray-200 placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-gray-600 transition-all"
+                  className="w-full pl-10 pr-4 py-2.5 bg-gray-100 dark:bg-gray-700 border-0 rounded-xl text-sm text-gray-700 dark:text-gray-200 placeholder-gray-400 focus:ring-2 focus:ring-primary-500 focus:bg-white dark:focus:bg-gray-600 transition-all"
                 />
               </div>
             </div>
@@ -208,7 +208,7 @@ const AdminLayout = () => {
                         to={item.path}
                         className={`group flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 ${
                           isActive
-                            ? "bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-lg shadow-indigo-500/30"
+                            ? "bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg shadow-primary-500/30"
                             : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                         }`}
                         title={isSidebarCollapsed ? item.label : ""}
@@ -218,7 +218,7 @@ const AdminLayout = () => {
                           className={
                             isActive
                               ? "text-white"
-                              : "text-gray-500 dark:text-gray-400 group-hover:text-indigo-600"
+                              : "text-gray-500 dark:text-gray-400 group-hover:text-primary-600"
                           }
                         />
                         {!isSidebarCollapsed && (
@@ -231,7 +231,7 @@ const AdminLayout = () => {
                                 className={`text-xs px-2 py-0.5 rounded-full font-semibold ${
                                   isActive
                                     ? "bg-white/20 text-white"
-                                    : "bg-indigo-100 text-indigo-600"
+                                    : "bg-primary-50 text-primary-600"
                                 }`}
                               >
                                 {item.badge}
@@ -252,7 +252,7 @@ const AdminLayout = () => {
             <div
               className={`flex items-center ${isSidebarCollapsed ? "justify-center" : "gap-3"}`}
             >
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold shadow-lg">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center text-white font-bold shadow-lg">
                 {user?.name?.charAt(0)?.toUpperCase() || "A"}
               </div>
               {!isSidebarCollapsed && (
@@ -371,7 +371,7 @@ const AdminLayout = () => {
                     {notifications.map((notif) => (
                       <div
                         key={notif.id}
-                        className={`px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer ${notif.unread ? "bg-indigo-50/50 dark:bg-indigo-900/20" : ""}`}
+                        className={`px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer ${notif.unread ? "bg-primary-50/50 dark:bg-primary-900/20" : ""}`}
                       >
                         <p className="text-sm text-gray-800 dark:text-gray-200">
                           {notif.message}
@@ -383,7 +383,7 @@ const AdminLayout = () => {
                     ))}
                   </div>
                   <div className="px-4 py-2 border-t border-gray-200 dark:border-gray-700">
-                    <button className="text-sm text-indigo-600 hover:text-indigo-700 font-medium">
+                    <button className="text-sm text-primary-600 hover:text-primary-700 font-medium">
                       View all notifications
                     </button>
                   </div>
@@ -400,7 +400,7 @@ const AdminLayout = () => {
                 }}
                 className="flex items-center gap-2 p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-colors"
               >
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center text-white font-bold text-sm">
                   {user?.name?.charAt(0)?.toUpperCase() || "A"}
                 </div>
                 <ChevronDown

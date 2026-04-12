@@ -27,6 +27,9 @@ import adminRoutes from './routes/adminRoutes.js';
 import inventoryRoutes from './routes/inventoryRoutes.js';
 import couponRoutes from './routes/couponRoutes.js';
 import customerRoutes from './routes/customerRoutes.js';
+import supplierRoutes from './routes/supplierRoutes.js';
+import reportRoutes from './routes/reportRoutes.js';
+import adminUserRoutes from './routes/adminUserRoutes.js';
 
 dotenv.config();
 
@@ -112,6 +115,9 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/inventory', inventoryRoutes);
 app.use('/api/coupons', couponRoutes);
 app.use('/api/customers', customerRoutes);
+app.use('/api/suppliers', supplierRoutes);
+app.use('/api/reports', reportRoutes);
+app.use('/api/admin/users', adminUserRoutes);
 
 // Also expose them under /api/v1 for API versioning
 app.use('/api/v1/auth', authRoutes);

@@ -7,31 +7,19 @@ import {
   ChevronDown,
   Folder,
   FolderOpen,
-  MoreHorizontal,
   Search,
-  GripVertical,
   Image as ImageIcon,
+  MoreHorizontal
 } from "lucide-react";
-import api from "../../utils/api";
+import api from "../../services/api";
 import {
   Modal,
   ConfirmDialog,
-  Card,
-  CardHeader,
   LoadingSpinner,
-  EmptyState,
 } from "../components/AdminUI";
 import toast from "react-hot-toast";
 
-// Category Form Modal
-const CategoryFormModal = ({
-  isOpen,
-  onClose,
-  category,
-  parentCategory,
-  onSave,
-  categories,
-}) => {
+const CategoryFormModal = ({ isOpen, onClose, category, parentCategory, onSave, categories }) => {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -39,8 +27,6 @@ const CategoryFormModal = ({
     parent: "",
     priority: 0,
     isActive: true,
-    metaTitle: "",
-    metaDescription: "",
   });
   const [loading, setLoading] = useState(false);
 
@@ -53,8 +39,6 @@ const CategoryFormModal = ({
         parent: category.parent?._id || category.parent || "",
         priority: category.priority || 0,
         isActive: category.isActive ?? true,
-        metaTitle: category.metaTitle || "",
-        metaDescription: category.metaDescription || "",
       });
     } else {
       setFormData({
@@ -64,528 +48,162 @@ const CategoryFormModal = ({
         parent: parentCategory?._id || "",
         priority: 0,
         isActive: true,
-        metaTitle: "",
-        metaDescription: "",
       });
     }
   }, [category, parentCategory, isOpen]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.name.trim()) {
-      toast.error("Category name is required");
-      return;
-    }
-
+    if (!formData.name.trim()) return toast.error("Name is required");
     setLoading(true);
-    try {
-      await onSave(formData, category?._id);
-      onClose();
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
+    try { await onSave(formData, category?._id); onClose(); } catch (error) { console.error(error); } finally { setLoading(false); }
   };
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      title={category ? "Edit Category" : "Add Category"}
-      size="md"
-    >
-      <form onSubmit={handleSubmit} className="space-y-5">
-        {/* Name */}
+    <Modal isOpen={isOpen} onClose={onClose} title={category ? "Edit Category" : "Add New Category"} size="md">
+      <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
-            Category Name <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            className="w-full px-4 py-2.5 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700"
-            placeholder="Enter category name"
-          />
+          <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Category Name</label>
+          <input type="text" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="w-full mt-1 px-4 py-2 border border-gray-100 rounded-lg text-sm font-semibold focus:border-primary-300 outline-none" placeholder="E.G. Fresh Vegetables" />
         </div>
 
-        {/* Parent Category */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
-            Parent Category
-          </label>
-          <select
-            value={formData.parent}
-            onChange={(e) =>
-              setFormData({ ...formData, parent: e.target.value })
-            }
-            className="w-full px-4 py-2.5 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700"
-          >
-            <option value="">None (Top Level)</option>
-            {(() => {
-                const renderOptions = (cats, level = 0) => {
-                    return cats.reduce((acc, cat) => {
-                        if (cat._id !== category?._id) {
-                            acc.push(
-                                <option key={cat._id} value={cat._id}>
-                                    {'\u00A0'.repeat(level * 4)}
-                                    {level > 0 ? '↳ ' : ''}
-                                    {cat.name}
-                                </option>
-                            );
-                            if (cat.children && cat.children.length > 0) {
-                                acc.push(...renderOptions(cat.children, level + 1));
-                            }
-                        }
-                        return acc;
-                    }, []);
-                };
-                return renderOptions(categories); // Note: we need to pass 'categories' state here, change component prop mapping
-            })()}
-          </select>
+           <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Parent Category</label>
+           <select value={formData.parent} onChange={(e) => setFormData({ ...formData, parent: e.target.value })} className="w-full mt-1 px-4 py-2 border border-gray-100 rounded-lg text-sm bg-white focus:border-primary-300 outline-none">
+              <option value="">None (Root Category)</option>
+              {categories.map(cat => <option key={cat._id} value={cat._id}>{cat.name}</option>)}
+           </select>
         </div>
 
-        {/* Description */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
-            Description
-          </label>
-          <textarea
-            value={formData.description}
-            onChange={(e) =>
-              setFormData({ ...formData, description: e.target.value })
-            }
-            rows={3}
-            className="w-full px-4 py-2.5 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700"
-            placeholder="Category description"
-          />
+          <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Brief Description</label>
+          <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows={2} className="w-full mt-1 px-4 py-2 border border-gray-100 rounded-lg text-sm resize-none focus:border-primary-300 outline-none" />
         </div>
 
-        {/* Image URL */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
-            Image URL
-          </label>
-          <input
-            type="text"
-            value={formData.image}
-            onChange={(e) =>
-              setFormData({ ...formData, image: e.target.value })
-            }
-            className="w-full px-4 py-2.5 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700"
-            placeholder="https://..."
-          />
-        </div>
-
-        {/* Priority & Status */}
         <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
-              Priority (Sort Order)
-            </label>
-            <input
-              type="number"
-              value={formData.priority}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  priority: parseInt(e.target.value) || 0,
-                })
-              }
-              className="w-full px-4 py-2.5 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
-              Status
-            </label>
-            <select
-              value={formData.isActive.toString()}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  isActive: e.target.value === "true",
-                })
-              }
-              className="w-full px-4 py-2.5 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700"
-            >
-              <option value="true">Active</option>
-              <option value="false">Inactive</option>
-            </select>
-          </div>
+           <div>
+             <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Priority Index</label>
+             <input type="number" value={formData.priority} onChange={(e) => setFormData({ ...formData, priority: parseInt(e.target.value) || 0 })} className="w-full mt-1 px-4 py-2 border border-gray-100 rounded-lg text-sm" />
+           </div>
+           <div>
+              <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Status</label>
+              <select value={formData.isActive.toString()} onChange={(e) => setFormData({ ...formData, isActive: e.target.value === "true" })} className="w-full mt-1 px-4 py-2 border border-gray-100 rounded-lg text-sm bg-white">
+                 <option value="true">Active</option>
+                 <option value="false">Hidden</option>
+              </select>
+           </div>
         </div>
 
-        {/* SEO Fields */}
-        <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
-          <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">
-            SEO Settings
-          </h4>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
-                Meta Title
-              </label>
-              <input
-                type="text"
-                value={formData.metaTitle}
-                onChange={(e) =>
-                  setFormData({ ...formData, metaTitle: e.target.value })
-                }
-                className="w-full px-4 py-2.5 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700"
-                placeholder="SEO title"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
-                Meta Description
-              </label>
-              <textarea
-                value={formData.metaDescription}
-                onChange={(e) =>
-                  setFormData({ ...formData, metaDescription: e.target.value })
-                }
-                rows={2}
-                className="w-full px-4 py-2.5 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700"
-                placeholder="SEO description"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Actions */}
-        <div className="flex justify-end gap-3 pt-4">
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-4 py-2.5 border border-gray-200 dark:border-gray-700 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            disabled={loading}
-            className="px-4 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-medium hover:bg-indigo-700 disabled:opacity-50 flex items-center gap-2"
-          >
-            {loading && <LoadingSpinner size="sm" />}
-            {category ? "Update Category" : "Create Category"}
-          </button>
+        <div className="flex gap-3 pt-4 border-t border-gray-50">
+           <button type="button" onClick={onClose} className="flex-1 py-2 text-sm font-bold text-gray-500">Cancel</button>
+           <button type="submit" disabled={loading} className="flex-2 py-2 bg-primary-600 text-white rounded-lg text-sm font-bold flex items-center justify-center gap-2 px-6">
+              {loading && <LoadingSpinner size="sm" />} {category ? "Update" : "Save Category"}
+           </button>
         </div>
       </form>
     </Modal>
   );
 };
 
-// Category Tree Item
-const CategoryTreeItem = ({
-  category,
-  level = 0,
-  onEdit,
-  onDelete,
-  onAddChild,
-}) => {
-  const [isExpanded, setIsExpanded] = useState(true);
+const CategoryItem = ({ category, level = 0, onEdit, onDelete, onAddChild }) => {
+  const [expanded, setExpanded] = useState(false);
   const hasChildren = category.children && category.children.length > 0;
 
   return (
-    <div>
-      <div
-        className={`group flex items-center gap-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors ${
-          level > 0
-            ? "border-l-2 border-gray-200 dark:border-gray-700 ml-6"
-            : ""
-        }`}
-        style={{ paddingLeft: `${level * 24 + 16}px` }}
-      >
-        {/* Expand/Collapse */}
-        <button
-          onClick={() => setIsExpanded(!isExpanded)}
-          className={`p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-600 ${!hasChildren && "invisible"}`}
-        >
-          {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+    <div className="border-b last:border-0 border-gray-50">
+      <div className={`flex items-center gap-4 px-4 py-3 hover:bg-gray-50 transition-all ${level > 0 ? "bg-gray-50/30" : ""}`} style={{ paddingLeft: `${level * 24 + 16}px` }}>
+        <button onClick={() => setExpanded(!expanded)} className={`p-1 rounded hover:bg-white text-gray-400 ${!hasChildren && "invisible"}`}>
+           {expanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
         </button>
-
-        {/* Icon */}
-        <div
-          className={`p-2 rounded-lg ${category.isActive ? "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600" : "bg-gray-100 dark:bg-gray-700 text-gray-500"}`}
-        >
-          {isExpanded && hasChildren ? (
-            <FolderOpen size={18} />
-          ) : (
-            <Folder size={18} />
-          )}
+        
+        <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${category.isActive ? "bg-primary-50 text-primary-600" : "bg-gray-100 text-gray-400"}`}>
+           {hasChildren ? <FolderOpen size={16} /> : <Folder size={16} />}
         </div>
 
-        {/* Image */}
-        {category.image && (
-          <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
-            <img
-              src={category.image.startsWith('http') 
-                ? category.image 
-                : `${import.meta.env.VITE_API_URL.replace('/api', '')}/${category.image}`
-              }
-              alt={category.name}
-              className="w-full h-full object-cover"
-            />
-          </div>
-        )}
-
-        {/* Name & Info */}
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
-            <span className="font-medium text-gray-900 dark:text-white truncate">
-              {category.name}
-            </span>
-            {!category.isActive && (
-              <span className="text-xs px-2 py-0.5 bg-gray-100 dark:bg-gray-700 text-gray-500 rounded-full">
-                Inactive
-              </span>
-            )}
-          </div>
-          <p className="text-xs text-gray-500 truncate">
-            {category.description || "No description"}
-          </p>
+        <div className="flex-1">
+           <p className="text-sm font-bold text-gray-900">{category.name}</p>
+           <p className="text-[10px] text-gray-400 font-medium">{category.productCount || 0} Products</p>
         </div>
 
-        {/* Product Count */}
-        <span className="text-sm text-gray-500">
-          {category.productCount || 0} products
-        </span>
-
-        {/* Actions */}
-        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-          <button
-            onClick={() => onAddChild(category)}
-            className="p-2 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg text-gray-500 hover:text-indigo-600"
-            title="Add Subcategory"
-          >
-            <Plus size={16} />
-          </button>
-          <button
-            onClick={() => onEdit(category)}
-            className="p-2 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg text-gray-500 hover:text-indigo-600"
-            title="Edit"
-          >
-            <Edit2 size={16} />
-          </button>
-          <button
-            onClick={() => onDelete(category)}
-            className="p-2 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg text-gray-500 hover:text-red-600"
-            title="Delete"
-          >
-            <Trash2 size={16} />
-          </button>
+        <div className="flex items-center gap-1">
+           <button onClick={() => onAddChild(category)} className="p-2 text-gray-400 hover:text-primary-600 transition-colors"><Plus size={16} /></button>
+           <button onClick={() => onEdit(category)} className="p-2 text-gray-400 hover:text-primary-600 transition-colors"><Edit2 size={16} /></button>
+           <button onClick={() => onDelete(category)} className="p-2 text-red-300 hover:text-red-500 transition-colors"><Trash2 size={16} /></button>
         </div>
       </div>
-
-      {/* Children */}
-      {isExpanded && hasChildren && (
-        <div>
-          {category.children.map((child) => (
-            <CategoryTreeItem
-              key={child._id}
-              category={child}
-              level={level + 1}
-              onEdit={onEdit}
-              onDelete={onDelete}
-              onAddChild={onAddChild}
-            />
-          ))}
-        </div>
+      {expanded && hasChildren && (
+        <div>{category.children.map(child => <CategoryItem key={child._id} category={child} level={level + 1} onEdit={onEdit} onDelete={onDelete} onAddChild={onAddChild} />)}</div>
       )}
     </div>
   );
 };
 
-// Main Categories Component
 const Categories = () => {
   const [categories, setCategories] = useState([]);
-  const [flatCategories, setFlatCategories] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [formModal, setFormModal] = useState({
-    isOpen: false,
-    category: null,
-    parent: null,
-  });
-  const [deleteModal, setDeleteModal] = useState({
-    isOpen: false,
-    category: null,
-  });
-  const [deleting, setDeleting] = useState(false);
+  const [search, setSearch] = useState("");
+  const [formModal, setFormModal] = useState({ isOpen: false, category: null, parent: null });
+  const [deleteModal, setDeleteModal] = useState({ isOpen: false, category: null });
 
-  useEffect(() => {
-    fetchCategories();
-  }, []);
+  useEffect(() => { fetchCategories(); }, []);
 
   const fetchCategories = async () => {
     try {
       setLoading(true);
-      // Fetch flat categories for search/list
-      const flatRes = await api.get("/categories");
-      setFlatCategories(flatRes.data.data || flatRes.data || []);
-
-      // Fetch official hierarchy from backend
-      const hierarchyRes = await api.get("/categories/hierarchy");
-      setCategories(hierarchyRes.data.data || hierarchyRes.data || []);
-    } catch (error) {
-      console.error("Error fetching categories:", error);
-      toast.error("Failed to fetch categories");
-    } finally {
-      setLoading(false);
-    }
+      const res = await api.get("/categories?hierarchy=true");
+      setCategories(res.data.data || []);
+    } catch (error) { toast.error("Category sync error"); } finally { setLoading(false); }
   };
 
-  const handleSave = async (formData, categoryId) => {
+  const handleSave = async (formData, id) => {
     try {
-      if (categoryId) {
-        await api.put(`/categories/${categoryId}`, formData);
-        toast.success("Category updated successfully");
-      } else {
-        await api.post("/categories", formData);
-        toast.success("Category created successfully");
-      }
+      if (id) await api.put(`/categories/${id}`, formData);
+      else await api.post("/categories", formData);
+      toast.success(id ? "Category updated" : "Category created");
       fetchCategories();
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to save category");
-      throw error;
-    }
+    } catch (error) { toast.error("Action failed"); throw error; }
   };
 
   const handleDelete = async () => {
-    if (!deleteModal.category) return;
-
     try {
-      setDeleting(true);
       await api.delete(`/categories/${deleteModal.category._id}`);
-      toast.success("Category deleted successfully");
+      toast.success("Category purging successful");
       setDeleteModal({ isOpen: false, category: null });
       fetchCategories();
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to delete category");
-    } finally {
-      setDeleting(false);
-    }
+    } catch (error) { toast.error("Referential integrity check failed"); }
   };
-
-  const filteredCategories = searchQuery
-    ? flatCategories.filter((cat) =>
-        cat.name.toLowerCase().includes(searchQuery.toLowerCase()),
-      )
-    : categories;
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Categories
-          </h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-1">
-            Organize your products with nested categories
-          </p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Taxonomy & Catalog</h1>
+          <p className="text-sm text-gray-500">Manage your product organizational hierarchy</p>
         </div>
-        <button
-          onClick={() =>
-            setFormModal({ isOpen: true, category: null, parent: null })
-          }
-          className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-medium hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-500/30"
-        >
-          <Plus size={18} />
-          <span>Add Category</span>
+        <button onClick={() => setFormModal({ isOpen: true, category: null, parent: null })} className="flex items-center gap-2 px-5 py-2.5 bg-primary-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-primary-600/20 hover:scale-105 active:scale-95 transition-all">
+          <Plus size={18} /> New Category
         </button>
       </div>
 
-      {/* Search */}
-      <Card>
-        <div className="relative">
-          <Search
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-            size={20}
-          />
-          <input
-            type="text"
-            placeholder="Search categories..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-          />
+      <div className="bg-white dark:bg-gray-800 p-2 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm flex items-center">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+          <input type="text" placeholder="Search categories..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-full pl-10 pr-4 py-2 bg-transparent text-sm font-medium outline-none" />
         </div>
-      </Card>
+      </div>
 
-      {/* Categories Tree */}
-      <Card padding={false}>
-        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-          <h3 className="font-semibold text-gray-900 dark:text-white">
-            Category Tree
-          </h3>
-        </div>
-
-        {loading ? (
-          <div className="p-12 flex justify-center">
-            <LoadingSpinner />
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+        <div className="p-4 border-b border-gray-50"><h3 className="text-xs font-black text-gray-400 uppercase tracking-widest">Active Tree</h3></div>
+        {loading ? <div className="p-12 text-center"><LoadingSpinner /></div> : (
+          <div className="divide-y divide-gray-50">
+            {categories.map(cat => <CategoryItem key={cat._id} category={cat} onEdit={(c) => setFormModal({ isOpen: true, category: c })} onDelete={(c) => setDeleteModal({ isOpen: true, category: c })} onAddChild={(p) => setFormModal({ isOpen: true, parent: p })} />)}
           </div>
-        ) : filteredCategories.length > 0 ? (
-          <div className="divide-y divide-gray-100 dark:divide-gray-700">
-            {(searchQuery ? filteredCategories : categories).map((category) => (
-              <CategoryTreeItem
-                key={category._id}
-                category={category}
-                onEdit={(cat) =>
-                  setFormModal({ isOpen: true, category: cat, parent: null })
-                }
-                onDelete={(cat) =>
-                  setDeleteModal({ isOpen: true, category: cat })
-                }
-                onAddChild={(parent) =>
-                  setFormModal({ isOpen: true, category: null, parent })
-                }
-              />
-            ))}
-          </div>
-        ) : (
-          <EmptyState
-            icon={Folder}
-            title="No categories yet"
-            description="Create your first category to organize products"
-            action={
-              <button
-                onClick={() =>
-                  setFormModal({ isOpen: true, category: null, parent: null })
-                }
-                className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm font-medium hover:bg-indigo-700"
-              >
-                Add Category
-              </button>
-            }
-          />
         )}
-      </Card>
+      </div>
 
-      {/* Category Form Modal */}
-      <CategoryFormModal
-        isOpen={formModal.isOpen}
-        onClose={() =>
-          setFormModal({ isOpen: false, category: null, parent: null })
-        }
-        category={formModal.category}
-        parentCategory={formModal.parent}
-        onSave={handleSave}
-        categories={categories}
-      />
-
-      {/* Delete Confirmation */}
-      <ConfirmDialog
-        isOpen={deleteModal.isOpen}
-        onClose={() => setDeleteModal({ isOpen: false, category: null })}
-        onConfirm={handleDelete}
-        title="Delete Category"
-        message={`Are you sure you want to delete "${deleteModal.category?.name}"? This will also delete all subcategories.`}
-        confirmText="Delete"
-        variant="danger"
-        loading={deleting}
-      />
+      <CategoryFormModal isOpen={formModal.isOpen} onClose={() => setFormModal({ isOpen: false, category: null, parent: null })} category={formModal.category} parentCategory={formModal.parent} onSave={handleSave} categories={categories} />
+      
+      <ConfirmDialog isOpen={deleteModal.isOpen} onClose={() => setDeleteModal({ isOpen: false, category: null })} onConfirm={handleDelete} title="Purge Category" message={`Are you sure you want to delete ${deleteModal.category?.name}? All sub-references will be lost.`} variant="danger" />
     </div>
   );
 };

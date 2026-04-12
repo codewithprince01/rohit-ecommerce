@@ -25,7 +25,7 @@ export const StatusBadge = ({ status, size = "md" }) => {
       label: "Confirmed",
     },
     processing: {
-      color: "bg-indigo-100 text-indigo-700 border-indigo-200",
+      color: "bg-primary-50 text-primary-600 border-primary-100",
       label: "Processing",
     },
     picking: {
@@ -291,7 +291,7 @@ export const DataTable = ({
               <th className="px-4 py-4 w-12">
                 <input
                   type="checkbox"
-                  className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                  className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
                   checked={
                     data.length > 0 &&
                     data.every((item) =>
@@ -342,7 +342,7 @@ export const DataTable = ({
                   >
                     <input
                       type="checkbox"
-                      className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                      className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
                       checked={selectedRows.includes(row._id || row.id)}
                       onChange={() => handleSelectRow(row._id || row.id)}
                     />
@@ -446,7 +446,7 @@ export const Pagination = ({
             disabled={page === "..."}
             className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
               page === currentPage
-                ? "bg-indigo-600 text-white"
+                ? "bg-primary-600 text-white shadow-lg shadow-primary-600/30"
                 : page === "..."
                   ? "text-gray-400 cursor-default"
                   : "text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600"
@@ -481,7 +481,7 @@ export const LoadingSpinner = ({ size = "md", className = "" }) => {
   return (
     <div className={`flex items-center justify-center ${className}`}>
       <div
-        className={`${sizeClasses[size]} border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin`}
+        className={`${sizeClasses[size]} border-4 border-gray-100 border-t-primary-500 rounded-full animate-spin`}
       ></div>
     </div>
   );

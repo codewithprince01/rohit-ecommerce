@@ -22,7 +22,7 @@ import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
   BarChart, Bar, Cell, PieChart, Pie
 } from "recharts";
-import api from "../../services/api"; // Using the synchronized service
+import api, { getImageUrl } from "../../services/api"; // Using the synchronized service
 
 // --- Sub-components ---
 
@@ -260,8 +260,8 @@ const Dashboard = () => {
               <AreaChart data={salesChartData}>
                 <defs>
                   <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.1}/>
-                    <stop offset="95%" stopColor="#4f46e5" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="#2fab73" stopOpacity={0.1}/>
+                    <stop offset="95%" stopColor="#2fab73" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
@@ -279,12 +279,12 @@ const Dashboard = () => {
                 />
                 <Tooltip 
                   contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', fontWeight: 700 }}
-                  cursor={{ stroke: '#4f46e5', strokeWidth: 2, strokeDasharray: '5 5' }}
+                  cursor={{ stroke: '#2fab73', strokeWidth: 2, strokeDasharray: '5 5' }}
                 />
                 <Area 
                   type="monotone" 
                   dataKey="revenue" 
-                  stroke="#4f46e5" 
+                  stroke="#2fab73" 
                   strokeWidth={3}
                   fillOpacity={1} 
                   fill="url(#colorRev)" 

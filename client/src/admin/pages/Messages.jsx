@@ -2,7 +2,9 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
-import api from '../../utils/api';
+import api from '../../services/api';
+import { Mail, Trash2, CheckCircle, RefreshCw, Filter, Search, User, Clock, MessageSquare } from 'lucide-react';
+import { LoadingSpinner, StatusBadge } from '../components/AdminUI';
 
 const AdminMessages = () => {
   const navigate = useNavigate();
@@ -20,14 +22,14 @@ const AdminMessages = () => {
   }, [user, navigate, filter]);
 
   const fetchMessages = async () => {
-    setLoading(true);
     try {
+      setLoading(true);
       const url = filter !== '' ? `/contact?isRead=${filter}` : '/contact';
       const response = await api.get(url);
       setMessages(response.data.data);
     } catch (error) {
-      console.error('Error fetching messages:', error);
-      toast.error('Failed to load messages');
+      console.error(error);
+      toast.error('Inbound communications failure');
     } finally {
       setLoading(false);
     }
@@ -36,118 +38,89 @@ const AdminMessages = () => {
   const markAsRead = async (id) => {
     try {
       await api.put(`/contact/${id}/read`);
-      toast.success('Marked as read');
+      toast.success('Message archived as read');
       fetchMessages();
-    } catch (error) {
-      console.error('Error marking message:', error);
-      toast.error('Failed to update message');
-    }
+    } catch (error) { toast.error('Status sync error'); }
   };
 
   const deleteMessage = async (id) => {
-    if (!confirm('Are you sure you want to delete this message?')) return;
-    
+    if (!confirm('Permanent deletion of this record?')) return;
     try {
       await api.delete(`/contact/${id}`);
-      toast.success('Message deleted');
+      toast.success('Record purged');
       fetchMessages();
-    } catch (error) {
-      console.error('Error deleting message:', error);
-      toast.error('Failed to delete message');
-    }
+    } catch (error) { toast.error('Deactivation restricted'); }
   };
 
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-      </div>
-    );
-  }
+  if (loading) return <div className="flex items-center justify-center h-96"><LoadingSpinner size="lg" /></div>;
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Contact Messages</h1>
-        <select
-          value={filter}
-          onChange={(e) => setFilter(e.target.value)}
-          className="input w-48"
-        >
-          <option value="">All Messages</option>
-          <option value="false">Unread</option>
-          <option value="true">Read</option>
-        </select>
+    <div className="space-y-6 max-w-5xl">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Customer Inquiries</h1>
+          <p className="text-sm text-gray-500 font-medium">Manage your inbound contact messages</p>
+        </div>
+        <div className="flex items-center gap-2">
+           <select value={filter} onChange={(e) => setFilter(e.target.value)} className="px-4 py-2 border border-gray-100 rounded-lg text-xs font-bold uppercase tracking-wider bg-white dark:bg-gray-800 outline-none">
+              <option value="">All Threads</option>
+              <option value="false">Unread Only</option>
+              <option value="true">Archived</option>
+           </select>
+           <button onClick={fetchMessages} className="p-2 border border-gray-200 rounded-lg hover:bg-gray-50"><RefreshCw size={18} /></button>
+        </div>
       </div>
 
       <div className="space-y-4">
         {messages.map((message) => (
-          <div
-            key={message._id}
-            className={`bg-white rounded-lg shadow p-6 ${
-              !message.isRead ? 'border-l-4 border-primary-600' : ''
-            }`}
-          >
-            <div className="flex justify-between items-start mb-4">
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900">{message.name}</h3>
-                <p className="text-sm text-gray-600">{message.email}</p>
-                {message.phone && (
-                  <p className="text-sm text-gray-600">{message.phone}</p>
-                )}
-              </div>
-              <div className="text-right">
-                <p className="text-sm text-gray-500">{formatDate(message.createdAt)}</p>
-                {!message.isRead && (
-                  <span className="inline-block mt-1 px-2 py-1 bg-primary-100 text-primary-800 text-xs rounded">
-                    Unread
-                  </span>
-                )}
-              </div>
-            </div>
+          <div key={message._id} className={`bg-white dark:bg-gray-800 rounded-2xl border ${!message.isRead ? 'border-primary-600 shadow-md shadow-primary-600/5' : 'border-gray-100 dark:border-gray-700'} p-5 transition-all hover:shadow-lg`}>
+            <div className="flex flex-col md:flex-row gap-6">
+               <div className="md:w-64 space-y-3">
+                  <div className="flex items-center gap-3">
+                     <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-primary-600 text-xs font-bold">
+                        {message.name?.charAt(0)}
+                     </div>
+                     <div className="min-w-0">
+                        <p className="text-sm font-bold text-gray-900 truncate">{message.name}</p>
+                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tight truncate">{message.email}</p>
+                     </div>
+                  </div>
+                  <div className="space-y-1">
+                     <div className="flex items-center gap-2 text-xs text-gray-500 font-medium"><Clock size={12} /> {new Date(message.createdAt).toLocaleDateString()}</div>
+                     <div className="flex items-center gap-2 text-xs text-gray-500 font-medium"><Phone size={12} /> {message.phone || 'N/A'}</div>
+                  </div>
+                  {!message.isRead && <span className="inline-block px-3 py-1 bg-primary-600 text-white text-[9px] font-black uppercase tracking-widest rounded-full">New Message</span>}
+               </div>
 
-            <div className="mb-4">
-              <h4 className="text-sm font-medium text-gray-700 mb-1">Subject:</h4>
-              <p className="text-sm text-gray-900">{message.subject}</p>
-            </div>
-
-            <div className="mb-4">
-              <h4 className="text-sm font-medium text-gray-700 mb-1">Message:</h4>
-              <p className="text-sm text-gray-600 whitespace-pre-wrap">{message.message}</p>
-            </div>
-
-            <div className="flex justify-end space-x-3 pt-4 border-t">
-              {!message.isRead && (
-                <button
-                  onClick={() => markAsRead(message._id)}
-                  className="text-sm text-primary-600 hover:text-primary-700 font-medium"
-                >
-                  Mark as Read
-                </button>
-              )}
-              <button
-                onClick={() => deleteMessage(message._id)}
-                className="text-sm text-red-600 hover:text-red-700 font-medium"
-              >
-                Delete
-              </button>
+               <div className="flex-1 flex flex-col justify-between">
+                  <div>
+                    <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-2 flex items-center gap-2">
+                       <MessageSquare size={12} className="text-primary-600" /> Subject: {message.subject}
+                    </h4>
+                    <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed italic bg-gray-50/50 p-4 rounded-xl">
+                       "{message.message}"
+                    </p>
+                  </div>
+                  
+                  <div className="flex justify-end gap-3 mt-4 border-t border-gray-50 pt-4">
+                     {!message.isRead && (
+                       <button onClick={() => markAsRead(message._id)} className="flex items-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-lg text-[10px] font-bold uppercase tracking-widest hover:bg-black transition-all">
+                          <CheckCircle size={14} /> Mark as Resolved
+                       </button>
+                     )}
+                     <button onClick={() => deleteMessage(message._id)} className="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all">
+                        <Trash2 size={14} /> Purge
+                     </button>
+                  </div>
+               </div>
             </div>
           </div>
         ))}
 
         {messages.length === 0 && (
-          <div className="text-center py-12 bg-white rounded-lg">
-            <p className="text-gray-500">No messages found</p>
+          <div className="text-center py-20 bg-white dark:bg-gray-800 rounded-3xl border border-gray-100 dark:border-gray-700">
+             <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4"><Mail className="text-gray-300" size={32} /></div>
+             <p className="text-gray-500 font-bold uppercase tracking-widest text-xs">Inbox is fully resolved</p>
           </div>
         )}
       </div>

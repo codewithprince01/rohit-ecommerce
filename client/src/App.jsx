@@ -35,6 +35,8 @@ import AdminCustomers from "./admin/pages/Customers";
 import AdminCoupons from "./admin/pages/Coupons";
 import AdminSettings from "./admin/pages/Settings";
 import AdminMessages from "./admin/pages/Messages";
+import AdminSuppliers from "./admin/pages/Suppliers";
+import AdminReports from "./admin/pages/Reports";
 import AdminLogin from "./admin/pages/Login";
 
 function App() {
@@ -92,22 +94,8 @@ function App() {
                     <Route path="orders" element={<AdminOrders />} />
                     <Route path="customers" element={<AdminCustomers />} />
                     <Route path="coupons" element={<AdminCoupons />} />
-                    <Route
-                      path="suppliers"
-                      element={
-                        <div className="text-center py-12 text-gray-500">
-                          Suppliers Management - Coming Soon
-                        </div>
-                      }
-                    />
-                    <Route
-                      path="reports"
-                      element={
-                        <div className="text-center py-12 text-gray-500">
-                          Reports & Analytics - Coming Soon
-                        </div>
-                      }
-                    />
+                    <Route path="suppliers" element={<AdminSuppliers />} />
+                    <Route path="reports" element={<AdminReports />} />
                     <Route path="settings" element={<AdminSettings />} />
                     <Route
                       path="users"

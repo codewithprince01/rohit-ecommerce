@@ -7,7 +7,11 @@ const removeImage = (imagePath) => {
     if(!imagePath) return;
     const fullPath = path.join(process.cwd(), imagePath);
     if(fs.existsSync(fullPath)) {
-        fs.unlinkSync(fullPath);
+        try {
+            fs.unlinkSync(fullPath);
+        } catch (err) {
+            console.error(`Failed to delete old image ${imagePath}:`, err.message);
+        }
     }
 }
 
@@ -18,7 +22,6 @@ export const getSettings = async (req, res) => {
     try {
         let settings = await Settings.findOne();
         if (!settings) {
-            // Create default if not exists
             settings = await Settings.create({});
         }
         res.json({ success: true, data: settings });
@@ -39,29 +42,29 @@ export const updateSettings = async (req, res) => {
 
         const fields = req.body;
         
-        // Handle Banner/Logo upload
-        if (req.file) {
-            // Assuming the field name was 'banner' or 'logo'. 
-            // In route I used 'banner'. But model has 'logo'.
-            // I should stick to 'logo' or make it dynamic if multiple files.
-            // For now, let's assume route handles 'banner' but we save it as 'logo' or generic?
-            // Actually, `settingsRoutes` had `upload.single('banner')`.
-            // Let's assume user wants to update LOGO.
-            
-            if (settings.logo) removeImage(settings.logo);
-            settings.logo = req.file.path.replace(/\\/g, '/');
+        // Handle Logo & Favicon uploads if available
+        if (req.files) {
+            if (req.files.logo) {
+                if (settings.logo) removeImage(settings.logo);
+                settings.logo = req.files.logo[0].path.replace(/\\/g, '/');
+            }
+            if (req.files.favicon) {
+                if (settings.favicon) removeImage(settings.favicon);
+                settings.favicon = req.files.favicon[0].path.replace(/\\/g, '/');
+            }
         }
 
-        // Update fields
+        // Update other fields
         Object.keys(fields).forEach(key => {
-            // Nested objects like socialMedia needs parsing if sent as string or direct object
+            // Handle objects like socialMedia and seo
             if (key === 'socialMedia' || key === 'seo') {
-                if (typeof fields[key] === 'string') {
-                    settings[key] = JSON.parse(fields[key]);
-                } else {
-                     settings[key] = fields[key]; // Assuming body parser handles nested
+                try {
+                    const parsed = typeof fields[key] === 'string' ? JSON.parse(fields[key]) : fields[key];
+                    settings[key] = { ...settings[key], ...parsed };
+                } catch (e) {
+                    console.error(`Error parsing ${key}:`, e.message);
                 }
-            } else {
+            } else if (key !== 'logo' && key !== 'favicon') {
                 settings[key] = fields[key];
             }
         });
@@ -69,6 +72,7 @@ export const updateSettings = async (req, res) => {
         await settings.save();
         res.json({ success: true, data: settings });
     } catch (error) {
+        console.error('Update settings error:', error);
         res.status(500).json({ success: false, message: error.message });
     }
 };
