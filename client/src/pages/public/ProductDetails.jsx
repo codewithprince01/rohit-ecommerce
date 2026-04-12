@@ -3,7 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
 import { productService } from '../../services';
 import { useFetch } from '../../hooks/useFetch';
-import { ShoppingCart, Heart, Minus, Plus, ChevronRight, Truck, Shield, Clock } from 'lucide-react';
+import { ShoppingCart, Heart, Minus, Plus, ChevronRight, Truck, Shield, Clock, Star } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Head from '../../components/common/Head';
 import ProductCard from '../../components/common/ProductCard';
@@ -133,87 +133,99 @@ const ProductDetails = () => {
                     </div>
 
                     {/* Product Info */}
-                    <div>
-                        <h1 className="text-3xl md:text-4xl font-bold font-display text-gray-900 mb-4">{product.name}</h1>
+                    <div className="flex flex-col">
+                        <div className="mb-6">
+                           <span className="text-[10px] font-black text-primary-600 uppercase tracking-[0.2em] bg-primary-50 px-3 py-1.5 rounded-lg mb-4 inline-block">
+                              {product.category?.name || 'Essential'}
+                           </span>
+                           <h1 className="text-4xl md:text-5xl font-black font-display text-gray-950 mb-3 tracking-tighter leading-[1.1]">
+                              {product.name}
+                           </h1>
+                           <div className="flex items-center gap-2">
+                              <span className="text-gray-400 font-bold text-sm tracking-tight">{product.unit || '1 unit'}</span>
+                              <div className="w-1 h-1 bg-gray-300 rounded-full" />
+                              <div className="flex items-center gap-1">
+                                 <Star size={14} className="fill-amber-400 text-amber-400" />
+                                 <span className="text-sm font-bold text-gray-700">4.8 (2k+ reviews)</span>
+                              </div>
+                           </div>
+                        </div>
                         
-                        <div className="flex items-center gap-4 mb-6">
-                            <div className="flex items-end gap-3">
-                                <span className="text-3xl font-bold text-primary-600">₹{product.price}</span>
-                                {product.comparePrice > product.price && (
-                                    <span className="text-xl text-gray-400 line-through mb-1">₹{product.comparePrice}</span>
-                                )}
-                            </div>
-                            <span className="bg-primary-50 text-primary-700 px-3 py-1 rounded text-sm font-medium">
-                                In Stock
-                            </span>
+                        <div className="bg-gray-50/50 p-8 rounded-[2.5rem] mb-10 border border-gray-100">
+                           <div className="flex items-baseline gap-3 mb-1">
+                               <span className="text-5xl font-black text-gray-950 tracking-tighter italic">₹{product.price}</span>
+                               {product.comparePrice > product.price && (
+                                   <span className="text-2xl text-gray-400 line-through font-bold">₹{product.comparePrice}</span>
+                               )}
+                               <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ml-auto translate-y-[-10px]">
+                                  {discount}% OFF
+                               </span>
+                           </div>
+                           <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">(Inclusive of all taxes)</p>
                         </div>
 
-                        <p className="text-gray-600 leading-relaxed mb-8 text-lg">
-                            {product.description || 'No description available for this product.'}
-                        </p>
+                        <div className="space-y-8">
+                           <div className="flex items-center gap-8">
+                               <div className="flex flex-col">
+                                  <span className="text-xs font-black text-gray-400 uppercase tracking-widest mb-3">Quantity</span>
+                                  <div className="flex items-center bg-white border-2 border-primary-500 rounded-[1.25rem] h-14 w-40 overflow-hidden shadow-sm">
+                                      <button 
+                                          onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                                          className="flex-1 h-full flex items-center justify-center hover:bg-primary-50 text-primary-600 transition-colors"
+                                      >
+                                          <Minus size={20} strokeWidth={3} />
+                                      </button>
+                                      <span className="w-12 text-center font-black text-2xl text-gray-950">{quantity}</span>
+                                      <button 
+                                          onClick={() => setQuantity(quantity + 1)}
+                                          className="flex-1 h-full flex items-center justify-center hover:bg-primary-50 text-primary-600 transition-colors"
+                                      >
+                                          <Plus size={20} strokeWidth={3} />
+                                      </button>
+                                  </div>
+                               </div>
+                               <div className="flex-1">
+                                  <span className="text-xs font-black text-gray-400 uppercase tracking-widest mb-3 block">Quick Actions</span>
+                                  <div className="flex gap-4">
+                                     <button 
+                                         onClick={handleAddToCart}
+                                         className="flex-1 bg-gray-950 text-white h-14 rounded-[1.25rem] font-black text-xs uppercase tracking-[0.2em] shadow-xl hover:bg-primary-600 transition-all active:scale-95"
+                                     >
+                                         Add to Cart
+                                     </button>
+                                     <button 
+                                         onClick={handleBuyNow}
+                                         className="flex-1 bg-primary-600 text-white h-14 rounded-[1.25rem] font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-primary-500/20 hover:bg-black transition-all active:scale-95"
+                                     >
+                                         Buy Now
+                                     </button>
+                                  </div>
+                               </div>
+                           </div>
 
-                        {/* Actions */}
-                        <div className="space-y-6 border-t border-b border-gray-100 py-8 mb-8">
-                            <div className="flex items-center gap-6">
-                                <span className="font-semibold text-gray-900">Quantity:</span>
-                                <div className="flex items-center border border-gray-300 rounded-lg h-12 w-32">
-                                    <button 
-                                        onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                                        className="w-10 h-full flex items-center justify-center hover:bg-gray-100 text-gray-600 rounded-l-lg"
-                                    >
-                                        <Minus size={18} />
-                                    </button>
-                                    <span className="flex-1 text-center font-bold text-lg">{quantity}</span>
-                                    <button 
-                                        onClick={() => setQuantity(quantity + 1)}
-                                        className="w-10 h-full flex items-center justify-center hover:bg-gray-100 text-gray-600 rounded-r-lg"
-                                    >
-                                        <Plus size={18} />
-                                    </button>
-                                </div>
-                            </div>
+                           <div className="space-y-4 pt-8 border-t border-gray-100">
+                              <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest">Product Details</h4>
+                              <p className="text-gray-600 leading-relaxed font-medium">
+                                 {product.description || 'Premium quality selection curated specifically for your daily health and kitchen needs.'}
+                              </p>
+                           </div>
 
-                            <div className="flex flex-col sm:flex-row gap-4">
-                                <button 
-                                    onClick={handleAddToCart}
-                                    className="flex-1 btn btn-secondary btn-lg rounded-xl shadow-lg shadow-secondary-600/20"
-                                >
-                                    <ShoppingCart size={22} /> Add to Cart
-                                </button>
-                                <button 
-                                    onClick={handleBuyNow}
-                                    className="flex-1 btn btn-primary btn-lg rounded-xl shadow-lg shadow-primary-600/20"
-                                >
-                                    Buy Now
-                                </button>
-                            </div>
-                        </div>
-
-                         {/* Trust Badges */}
-                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-xl">
-                                <Truck className="text-primary-600" size={24} />
-                                <div>
-                                    <p className="font-bold text-gray-900 text-sm">Fast Delivery</p>
-                                    <p className="text-xs text-gray-500">Local delivery within 24h</p>
-                                </div>
-                            </div>
-                            <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-xl">
-                                <Shield className="text-primary-600" size={24} />
-                                <div>
-                                    <p className="font-bold text-gray-900 text-sm">Genuine Product</p>
-                                    <p className="text-xs text-gray-500">100% Authentic items</p>
-                                </div>
-                            </div>
-                            <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-xl">
-                                <Clock className="text-primary-600" size={24} />
-                                <div>
-                                    <p className="font-bold text-gray-900 text-sm">Support 24/7</p>
-                                    <p className="text-xs text-gray-500">Contact us anytime</p>
-                                </div>
-                            </div>
+                           <div className="grid grid-cols-3 gap-4 pt-10">
+                              {[
+                                 { title: "10 Min", sub: "Delivery", icon: Clock },
+                                 { title: "Safe", sub: "Payment", icon: Shield },
+                                 { title: "Best", sub: "Price", icon: Truck }
+                              ].map((item, i) => (
+                                 <div key={i} className="flex flex-col items-center text-center p-4 bg-gray-50 rounded-[2rem] border border-transparent hover:border-primary-100 transition-all">
+                                    <item.icon className="text-primary-600 mb-3" size={20} />
+                                    <p className="text-xs font-black text-gray-950 leading-none">{item.title}</p>
+                                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tight mt-1">{item.sub}</p>
+                                 </div>
+                              ))}
+                           </div>
                         </div>
                     </div>
+v>
                 </div>
 
                 {/* Related Products */}

@@ -41,106 +41,66 @@ const ProductCard = ({ product }) => {
     return (
         <div 
             onClick={() => navigate(`/product/${product.slug}`)}
-            className="group bg-white rounded-[2rem] border border-gray-100 overflow-hidden hover:shadow-[0_20px_50px_rgba(0,0,0,0.08)] transition-all duration-500 cursor-pointer relative flex flex-col h-full ring-1 ring-gray-100/50 hover:ring-primary-400/20"
+            className="group bg-white rounded-[1.5rem] border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-500 cursor-pointer relative flex flex-col h-full"
         >
-            {/* Top Action Bar */}
-            <div className="absolute top-4 right-4 flex flex-col gap-2 z-20 translate-x-12 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-500">
-                <button className="w-10 h-10 rounded-full bg-white/90 backdrop-blur-md shadow-md flex items-center justify-center text-gray-400 hover:text-red-500 hover:scale-110 transition-all">
-                    <Heart size={18} />
-                </button>
-                <button className="w-10 h-10 rounded-full bg-white/90 backdrop-blur-md shadow-md flex items-center justify-center text-gray-400 hover:text-primary-600 hover:scale-110 transition-all">
-                    <Eye size={18} />
-                </button>
-            </div>
-
-            {/* Badges */}
-            <div className="absolute top-5 left-5 flex flex-col gap-2 z-20">
+            {/* Top Badges */}
+            <div className="absolute top-3 left-3 flex flex-col gap-1 z-20">
                 {discount > 0 && (
-                    <span className="bg-red-500 text-white text-[10px] font-black px-3 py-1.5 rounded-full shadow-lg shadow-red-500/20 uppercase tracking-wider">
-                        -{discount}%
-                    </span>
-                )}
-                {product.isOrganic && (
-                    <span className="bg-green-500 text-white text-[10px] font-black px-3 py-1.5 rounded-full shadow-lg shadow-green-500/20 uppercase tracking-wider">
-                        Organic
-                    </span>
-                )}
-                {product.isBestSeller && (
-                    <span className="bg-amber-500 text-white text-[10px] font-black px-3 py-1.5 rounded-full shadow-lg shadow-amber-500/20 uppercase tracking-wider">
-                        Best Seller
+                    <span className="bg-primary-600 text-white text-[9px] font-black px-2 py-1 rounded shadow-lg uppercase tracking-wider">
+                        {discount}% OFF
                     </span>
                 )}
             </div>
 
             {/* Image Section */}
-            <div className="relative aspect-[4/4] bg-gray-50/30 overflow-hidden p-6">
+            <div className="relative aspect-square bg-[#f8f9f8] overflow-hidden p-4">
                 <img 
                     src={imageUrl} 
                     alt={product.name} 
                     className="w-full h-full object-contain mix-blend-multiply group-hover:scale-110 transition-transform duration-700 ease-in-out"
                     loading="lazy"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-gray-900/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             </div>
 
             {/* Content Section */}
-            <div className="p-6 pt-2 flex-1 flex flex-col">
+            <div className="p-4 flex-1 flex flex-col">
                 <div className="flex-1">
-                    {/* Category/Unit */}
-                    <div className="flex items-center justify-between mb-2">
-                        <span className="text-[10px] font-black text-primary-600 uppercase tracking-widest bg-primary-50 px-2 py-0.5 rounded">
-                            {product.unit || '1 Unit'}
-                        </span>
-                        
-                        {/* Rating */}
-                        <div className="flex items-center gap-1">
-                            <Star size={12} className="fill-amber-400 text-amber-400" />
-                            <span className="text-[11px] font-bold text-gray-700">{product.averageRating || '4.8'}</span>
-                        </div>
+                    {/* Unit & Delivery */}
+                    <div className="flex items-center gap-2 mb-1">
+                       <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tight">{product.unit || '1 unit'}</span>
                     </div>
 
-                    <h3 className="text-gray-900 font-bold text-lg leading-tight mb-2 line-clamp-2 md:group-hover:text-primary-600 transition-colors duration-300">
+                    <h3 className="text-gray-900 font-bold text-sm leading-tight mb-2 line-clamp-2 min-h-[40px]">
                         {product.name}
                     </h3>
-                    
-                    <p className="text-gray-400 text-xs line-clamp-1 mb-4">
-                        {product.description || 'Premium quality selection'}
-                    </p>
                 </div>
 
-                {/* Price & Cart */}
-                <div className="flex items-center justify-between mt-auto pt-4 border-t border-gray-50">
+                {/* Price & Add Utility */}
+                <div className="flex items-center justify-between mt-auto">
                     <div className="flex flex-col">
-                        <div className="flex items-baseline gap-2">
-                            <span className="text-2xl font-black text-gray-900 tracking-tight font-display">₹{product.price}</span>
-                            {product.comparePrice > product.price && (
-                                <span className="text-sm text-gray-400 line-through font-medium">₹{product.comparePrice}</span>
-                            )}
-                        </div>
-                        <p className="text-[10px] text-green-600 font-bold">Inclusive of all taxes</p>
+                        <span className="text-base font-black text-gray-950">₹{product.price}</span>
+                        {product.comparePrice > product.price && (
+                            <span className="text-[10px] text-gray-400 line-through font-bold">₹{product.comparePrice}</span>
+                        )}
                     </div>
                     
                     <button 
                         onClick={handleAddToCart}
                         disabled={product.stock <= 0}
-                        className={`group/btn relative w-12 h-12 rounded-2xl flex items-center justify-center overflow-hidden transition-all duration-500 shadow-lg ${
+                        className={`px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border-2 transition-all shadow-sm ${
                             product.stock > 0 
-                                ? 'bg-primary-600 text-white hover:bg-black hover:shadow-black/20' 
-                                : 'bg-gray-100 text-gray-300 cursor-not-allowed'
+                                ? 'bg-white border-primary-500 text-primary-600 hover:bg-primary-500 hover:text-white' 
+                                : 'bg-gray-100 border-gray-100 text-gray-400 cursor-not-allowed'
                         }`}
                     >
-                        <ShoppingCart size={20} className="relative z-10 transition-transform group-hover/btn:scale-110" />
-                        <div className="absolute inset-0 bg-white/20 translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300" />
+                        {product.stock > 0 ? 'ADD' : 'OUT'}
                     </button>
                 </div>
             </div>
 
             {/* Out of Stock Overlay */}
             {product.stock <= 0 && (
-                <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] z-30 flex items-center justify-center p-6 text-center">
-                    <div className="bg-gray-900 text-white px-6 py-2.5 rounded-full shadow-xl animate-pulse font-black text-xs uppercase tracking-widest">
-                        Sold Out
-                    </div>
+                <div className="absolute inset-0 bg-white/40 backdrop-blur-sm z-30 flex items-center justify-center pointer-events-none">
                 </div>
             )}
         </div>

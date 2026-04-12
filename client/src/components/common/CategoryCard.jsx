@@ -3,9 +3,21 @@ import { useNavigate } from 'react-router-dom';
 const CategoryCard = ({ category }) => {
     const navigate = useNavigate();
 
+    const getFallbackImage = (name) => {
+        const query = name.toLowerCase();
+        if (query.includes('atta') || query.includes('flour')) return 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400';
+        if (query.includes('bread') || query.includes('pav')) return 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400';
+        if (query.includes('dairy') || query.includes('bakery')) return 'https://images.unsplash.com/photo-1550583724-125581cc255b?w=400';
+        if (query.includes('veg') || query.includes('fruit')) return 'https://images.unsplash.com/photo-1610348725531-843dff563e2c?w=400';
+        if (query.includes('home') || query.includes('care')) return 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=400';
+        if (query.includes('milk')) return 'https://images.unsplash.com/photo-1563636619-e910ef2a844b?w=400';
+        if (query.includes('mango')) return 'https://images.unsplash.com/photo-1553279768-865429fa0078?w=400';
+        return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=2fab73&color=fff&size=200`;
+    };
+
     const imageUrl = category.image 
-        ? `${import.meta.env.VITE_API_URL.replace('/api', '')}${category.image}`
-        : 'https://via.placeholder.com/150?text=Category';
+        ? `${import.meta.env.VITE_API_URL.replace('/api', '')}/${category.image.startsWith('/') ? category.image.slice(1) : category.image}`
+        : getFallbackImage(category.name);
 
     return (
         <div 

@@ -54,396 +54,306 @@ const Home = () => {
         description="Experience the freshest groceries delivered to your doorstep. Agrawal Store - Quality you can trust."
       />
 
-      {/* 1. PREMIUM HERO SECTION */}
-      <section
-        ref={heroRef}
-        className="relative pt-28 pb-20 lg:pt-36 lg:pb-32 overflow-hidden bg-white"
-      >
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-primary-50 via-white to-transparent -z-20" />
-        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-primary-100/40 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2 -z-10" />
-
+      {/* 1. ULTRA-PREMIUM "SEXY" HERO SECTION */}
+      <section className="relative pt-32 pb-24 lg:pt-48 lg:pb-40 overflow-hidden bg-white">
+        {/* Abstract Background Shapes */}
+        <div className="absolute top-0 right-0 w-[1000px] h-[1000px] bg-primary-100/30 rounded-full blur-[160px] -translate-y-1/2 translate-x-1/2 -z-10 animate-pulse" />
+        <div className="absolute top-[20%] left-[-10%] w-[600px] h-[600px] bg-orange-100/30 rounded-full blur-[120px] -z-10" />
+        
         <div className="container-custom relative z-10">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-8 items-center">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            {/* Left Content */}
             <motion.div
-              initial={{ opacity: 0, x: -50 }}
+              initial={{ opacity: 0, x: -60 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, ease: "easeOut" }}
-              className="max-w-2xl"
             >
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-primary-100 shadow-sm mb-8 animate-fade-in-up">
-                <span className="flex h-2 w-2 relative">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-primary-500"></span>
-                </span>
-                <span className="text-xs font-bold text-primary-700 tracking-wide uppercase">
-                  No.1 Grocery App in Morena
-                </span>
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-primary-50 border border-primary-100 mb-8 shadow-sm">
+                 <div className="w-2 h-2 rounded-full bg-primary-500 animate-ping" />
+                 <span className="text-[10px] font-black text-primary-700 tracking-[0.2em] uppercase">Morena's #1 Grocery App</span>
               </div>
-
-              <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-[1.1] font-display text-gray-900 tracking-tight">
-                Groceries delivered <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-600 to-primary-400">
-                  fresh & fast.
-                </span>
+              
+              <h1 className="text-6xl md:text-9xl font-black mb-8 leading-[0.85] font-display text-gray-950 tracking-tighter">
+                Freshness <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-600 to-primary-400">Delivered.</span>
               </h1>
-
-              <p className="text-lg md:text-xl text-gray-500 mb-10 leading-relaxed max-w-lg">
-                Get your daily needs sorted with Agrawal Store.
-                <span className="hidden sm:inline">
-                  {" "}
-                  Fresh vegetables, branded staples, and household items
-                  delivered in minutes.
-                </span>
+              
+              <p className="text-xl text-gray-500 mb-12 leading-relaxed max-w-lg font-medium">
+                We bring the farm to your doorstep in <span className="text-primary-600 font-black">10 minutes</span>. 
+                Experience premium grocery shopping like never before.
               </p>
 
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Link
-                  to="/products"
-                  className="btn btn-primary btn-lg shadow-primary-500/25"
-                >
-                  Start Shopping <ShoppingBag size={20} />
-                </Link>
-                <Link
-                  to="/categories"
-                  className="btn btn-outline btn-lg bg-white"
-                >
-                  View Categories
-                </Link>
+              {/* Integrated Modern Search */}
+              <div className="relative max-w-xl group mb-12">
+                <div className="absolute inset-0 bg-primary-500/10 blur-2xl group-focus-within:bg-primary-500/20 transition-all rounded-[2.5rem]" />
+                <div className="relative flex items-center bg-white border-2 border-gray-100 rounded-[2.5rem] p-2 shadow-2xl transition-all group-focus-within:border-primary-500/30">
+                   <div className="pl-6 text-primary-500">
+                      <Zap size={24} fill="currentColor" />
+                   </div>
+                   <input 
+                      type="text" 
+                      placeholder="Search 5000+ fresh items..." 
+                      className="flex-1 bg-transparent px-6 py-4 outline-none text-lg font-bold placeholder:text-gray-300"
+                   />
+                   <button className="bg-gray-950 text-white px-10 py-4 rounded-[2rem] font-black text-sm uppercase tracking-widest hover:bg-primary-600 hover:shadow-xl transition-all active:scale-95">
+                      Find Now
+                   </button>
+                </div>
               </div>
 
-              <div className="mt-12 flex items-center gap-4 text-sm font-medium text-gray-500">
-                <div className="flex items-center gap-1">
-                  <CheckCircle2 size={18} className="text-primary-500" /> Free
-                  Delivery
-                </div>
-                <div className="w-1 h-1 bg-gray-300 rounded-full" />
-                <div className="flex items-center gap-1">
-                  <CheckCircle2 size={18} className="text-primary-500" /> Best
-                  Prices
-                </div>
-                <div className="w-1 h-1 bg-gray-300 rounded-full" />
-                <div className="flex items-center gap-1">
-                  <CheckCircle2 size={18} className="text-primary-500" /> No
-                  Minimum Order
-                </div>
+              <div className="flex items-center gap-12">
+                 <div className="flex flex-col">
+                    <span className="text-4xl font-black text-gray-950">10k+</span>
+                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">Happy Families</span>
+                 </div>
+                 <div className="w-px h-12 bg-gray-100" />
+                 <div className="flex flex-col">
+                    <span className="text-4xl font-black text-gray-950">5000+</span>
+                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">Premium Products</span>
+                 </div>
               </div>
             </motion.div>
 
-            <motion.div style={{ y }} className="relative hidden lg:block">
-              <div className="relative z-10 w-full aspect-square max-w-[600px] mx-auto">
-                <img
-                  src="https://png.pngtree.com/png-vector/20240125/ourmid/pngtree-grocery-bag-with-vegetables-and-fruits-isolated-on-transparent-background-png-image_11490214.png"
-                  alt="Grocery Basket"
-                  className="w-full h-full object-contain drop-shadow-2xl animate-float"
-                />
-                {/* Floating Badges */}
-                <div className="absolute top-20 -right-0 bg-white/90 backdrop-blur-md p-4 rounded-2xl shadow-lg border border-white/50 flex items-center gap-3 animate-bounce-slow">
-                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-green-600">
-                    <Leaf size={24} />
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500 font-bold uppercase">
-                      Freshness
-                    </p>
-                    <p className="font-bold text-gray-900 text-lg">
-                      100% Guaranteed
-                    </p>
-                  </div>
-                </div>
-              </div>
+            {/* Right Content - 3D Visual Cluster */}
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 1, delay: 0.2 }}
+              className="relative hidden lg:flex items-center justify-center p-12"
+            >
+               {/* Main 3D Asset */}
+               <div className="relative z-20 w-full max-w-[550px] aspect-square transition-transform duration-1000 hover:scale-105">
+                  <img 
+                    src="https://png.pngtree.com/png-vector/20240125/ourmid/pngtree-grocery-bag-with-vegetables-and-fruits-isolated-on-transparent-background-png-image_11490214.png" 
+                    className="w-full h-full object-contain filter drop-shadow-[0_60px_100px_rgba(47,171,115,0.3)] animate-float"
+                    alt="Sexy Grocery" 
+                  />
+                  
+                  {/* Floating Micro-Cards */}
+                  <motion.div 
+                    animate={{ y: [0, -20, 0] }}
+                    transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                    className="absolute top-10 -right-12 bg-white/90 backdrop-blur-xl p-5 rounded-[2.5rem] shadow-2xl border border-white/50 flex items-center gap-4 animate-bounce-slow"
+                  >
+                    <div className="w-14 h-14 bg-orange-500 rounded-full flex items-center justify-center text-white shadow-lg">
+                      <Star size={24} fill="currentColor" />
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Customer Rated</p>
+                      <p className="font-black text-gray-950 text-xl tracking-tight">4.9 / 5.0</p>
+                    </div>
+                  </motion.div>
+
+                  <motion.div 
+                    animate={{ y: [0, 20, 0] }}
+                    transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+                    className="absolute -bottom-10 -left-12 bg-primary-600 p-6 rounded-[2.5rem] shadow-2xl flex items-center gap-5 text-white"
+                  >
+                    <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center">
+                      <Clock size={32} />
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-primary-100 font-bold uppercase tracking-widest">Instant Delivery</p>
+                      <p className="font-black text-2xl tracking-tight">10 Mins</p>
+                    </div>
+                  </motion.div>
+               </div>
+
+               {/* Background Decorative Rings */}
+               <div className="absolute inset-0 border-[40px] border-primary-50 opacity-30 rounded-full scale-110 -z-10" />
+               <div className="absolute inset-0 border-[1px] border-gray-100 p-20 rounded-full rotate-45 -z-10" />
             </motion.div>
           </div>
         </div>
       </section>
 
-      {/* 2. BRAND MARQUEE (Infinite Scroll) */}
-      <section className="py-10 bg-white border-y border-gray-100 overflow-hidden">
-        <div className="container-custom mb-6 text-center">
-          <p className="text-sm font-bold text-gray-400 uppercase tracking-widest">
-            Trusted by top brands
-          </p>
+      {/* 2. PROMO GRID (The Sexy Banners) */}
+      <section className="pb-24 bg-white">
+        <div className="container-custom">
+           <div className="grid md:grid-cols-3 gap-8">
+              <div className="md:col-span-2 group relative h-[350px] rounded-[3rem] overflow-hidden shadow-2xl transition-all duration-700 hover:shadow-primary-500/20">
+                 <img 
+                    src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=2574" 
+                    className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+                    alt="Promotion"
+                 />
+                 <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/30 to-transparent p-12 flex flex-col justify-center">
+                    <span className="bg-primary-500 text-white px-4 py-1.5 rounded-full text-[10px] font-black mb-6 w-fit uppercase tracking-widest anim-fade-in">Limited Offer</span>
+                    <h3 className="text-4xl md:text-6xl font-black text-white font-display mb-6 leading-none">Upto 50% <br /> <span className="text-primary-400 italic">Off</span> on Fruits</h3>
+                    <Link to="/products" className="w-fit bg-white text-gray-950 px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] hover:bg-primary-500 hover:text-white transition-all shadow-xl">Shop Now</Link>
+                 </div>
+              </div>
+              <div className="group relative h-[350px] rounded-[3rem] overflow-hidden shadow-2xl">
+                 <img 
+                    src="https://images.unsplash.com/photo-1550989460-0adf9ea622e2?auto=format&fit=crop&q=80&w=1000" 
+                    className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+                    alt="Dairy"
+                 />
+                 <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-all p-10 flex flex-col justify-end">
+                    <h3 className="text-2xl font-black text-white font-display mb-2">Morning Fresh</h3>
+                    <p className="text-gray-200 text-xs font-bold uppercase tracking-widest mb-6 border-b border-white/20 pb-4 inline-block">Pure Farm Milk & Eggs</p>
+                    <Link to="/category/dairy" className="text-white font-black text-[10px] uppercase tracking-[0.3em] flex items-center gap-2 hover:gap-4 transition-all">Explore <ArrowRight size={14} /></Link>
+                 </div>
+              </div>
+           </div>
         </div>
-        <div className="relative flex overflow-x-hidden group">
-          <div className="animate-marquee whitespace-nowrap flex items-center gap-16 px-8">
-            {BRAND_LOGOS.concat(BRAND_LOGOS).map((brand, index) => (
-              <span
-                key={index}
-                className="text-3xl md:text-4xl font-display font-bold text-gray-200 uppercase hover:text-primary-300 transition-colors cursor-default"
-              >
-                {brand}
-              </span>
+      </section>
+
+      {/* 2. CIRCLE CATEGORY GRID (Zepto/Blinkit Style) */}
+      <section className="py-12 bg-white">
+        <div className="container-custom">
+           <div className="flex items-center justify-between mb-8">
+              <h2 className="text-xl md:text-2xl font-black text-gray-950 font-display">Shop by Category</h2>
+              <Link to="/categories" className="text-primary-600 font-bold text-sm flex items-center gap-1 hover:gap-2 transition-all">View All <ArrowRight size={16} /></Link>
+           </div>
+           
+           <div className="grid grid-cols-4 md:grid-cols-8 lg:grid-cols-10 gap-x-4 gap-y-8">
+              {(categories || []).slice(0, 10).map((category) => (
+                <div 
+                   key={category._id} 
+                   onClick={() => navigate(`/category/${category.slug}`)}
+                   className="flex flex-col items-center gap-3 cursor-pointer group"
+                >
+                   <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-gray-50 flex items-center justify-center p-3 border-2 border-transparent group-hover:border-primary-500 group-hover:bg-primary-50 transition-all shadow-sm">
+                      <img 
+                        src={category.image ? `${import.meta.env.VITE_API_URL.replace('/api', '')}/${category.image.startsWith('/') ? category.image.slice(1) : category.image}` : `https://ui-avatars.com/api/?name=${category.name}&background=f3f4f6&color=2fab73`}
+                        className="w-full h-full object-contain mix-blend-multiply group-hover:scale-110 transition-all"
+                        alt={category.name}
+                      />
+                   </div>
+                   <span className="text-[10px] md:text-xs font-bold text-gray-700 text-center group-hover:text-primary-600 truncate w-full px-1">{category.name}</span>
+                </div>
+              ))}
+           </div>
+        </div>
+      </section>
+
+      {/* 3. HORIZONTAL PRODUCT CAROUSEL (Trending) */}
+      <section className="py-16 bg-[#f7f9f8]">
+        <div className="container-custom">
+           <div className="flex items-center justify-between mb-10">
+              <div className="flex items-center gap-4">
+                 <div className="w-10 h-10 rounded-2xl bg-orange-100 flex items-center justify-center text-orange-600">
+                    <Zap size={22} fill="currentColor" />
+                 </div>
+                 <div>
+                    <h2 className="text-2xl font-black text-gray-950 font-display leading-none">Trending Now</h2>
+                    <p className="text-xs font-bold text-gray-400 mt-1 uppercase tracking-widest">Most ordered in your area</p>
+                 </div>
+              </div>
+              <Link to="/products" className="hidden md:flex bg-white px-6 py-2 rounded-xl text-xs font-black uppercase tracking-widest border border-gray-100 hover:border-primary-500 transition-all shadow-sm">See More</Link>
+           </div>
+
+           <div className="flex overflow-x-auto gap-6 pb-8 scrollbar-hide snap-x no-scrollbar">
+              {featuredProducts && featuredProducts.length > 0 ? (
+                featuredProducts.map((product) => (
+                  <div key={product._id} className="min-w-[280px] md:min-w-[300px] snap-start">
+                     <ProductCard product={product} />
+                  </div>
+                ))
+              ) : (
+                 !featLoading && <p className="text-gray-400 font-bold p-10">Searching for newest stock...</p>
+              )}
+           </div>
+        </div>
+      </section>
+
+      {/* 4. MID-BANNERS (AD-STRIPS) */}
+      <section className="py-12 bg-white">
+        <div className="container-custom">
+           <div className="grid md:grid-cols-2 gap-6">
+              <div className="h-44 rounded-3xl bg-blue-600 overflow-hidden relative group cursor-pointer shadow-lg">
+                 <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1610348725531-843dff563e2c?w=800')] bg-cover opacity-20 transition-all duration-1000 group-hover:scale-110 group-hover:opacity-40" />
+                 <div className="relative z-10 p-8 h-full flex flex-col justify-center text-white">
+                    <h3 className="text-2xl font-black mb-1">Pesticide Free</h3>
+                    <p className="text-blue-100 font-bold mb-4">Direct from farm to home</p>
+                    <Link to="/category/fruits-vegetables" className="w-fit bg-white text-blue-600 px-4 py-2 rounded-xl font-black text-[10px] uppercase tracking-widest">Shop Veggies</Link>
+                 </div>
+              </div>
+              <div className="h-44 rounded-3xl bg-orange-600 overflow-hidden relative group cursor-pointer shadow-lg">
+                 <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1621939514649-280e2ee25f60?w=800')] bg-cover opacity-20 transition-all duration-1000 group-hover:scale-110 group-hover:opacity-40" />
+                 <div className="relative z-10 p-8 h-full flex flex-col justify-center text-white">
+                    <h3 className="text-2xl font-black mb-1">Weekend Munchies</h3>
+                    <p className="text-orange-100 font-bold mb-4">Upto 40% Off on Snacks</p>
+                    <Link to="/products" className="w-fit bg-white text-orange-600 px-4 py-2 rounded-xl font-black text-[10px] uppercase tracking-widest">Grab Now</Link>
+                 </div>
+              </div>
+           </div>
+        </div>
+      </section>
+
+      {/* 5. FRESH PRODUCE SECTION (Horizontal Scroll) */}
+      <section className="py-16 bg-white border-y border-gray-50">
+        <div className="container-custom">
+           <div className="flex items-center justify-between mb-10">
+              <div className="flex items-center gap-4">
+                 <div className="w-10 h-10 rounded-2xl bg-green-100 flex items-center justify-center text-green-600">
+                    <Leaf size={22} fill="currentColor" />
+                 </div>
+                 <div>
+                    <h2 className="text-2xl font-black text-gray-950 font-display leading-none">Fresh From Farm</h2>
+                    <p className="text-xs font-bold text-gray-400 mt-1 uppercase tracking-widest">Straight to your kitchen</p>
+                 </div>
+              </div>
+           </div>
+
+           <div className="flex overflow-x-auto gap-6 pb-8 scrollbar-hide snap-x no-scrollbar">
+              {featuredProducts && featuredProducts.length > 0 ? (
+                featuredProducts.filter(p => !p.isOrganic).map((product) => (
+                   <div key={product._id} className="min-w-[280px] md:min-w-[300px] snap-start">
+                      <ProductCard product={product} />
+                   </div>
+                ))
+              ) : (
+                [1,2,3,4].map(i => <div key={i} className="min-w-[300px] h-96 bg-gray-50 rounded-[2rem] animate-pulse" />)
+              )}
+           </div>
+        </div>
+      </section>
+
+      {/* 6. TRUST SIGNALS (Service Strip) */}
+      <section className="py-20 bg-gray-950 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
+        <div className="container-custom relative z-10">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+            {[
+              { title: "10 Minute Delivery", desc: "Super fast, super fresh.", icon: Clock, color: "text-primary-500" },
+              { title: "Best Price Guarantee", desc: "Lower prices than supermarkets.", icon: Shield, color: "text-primary-500" },
+              { title: "Exclusive Offers", desc: "Deals you can't say no to.", icon: Zap, color: "text-primary-500" }
+            ].map((item, i) => (
+              <div key={i} className="flex items-center gap-6 group">
+                <div className={`w-16 h-16 bg-white/5 rounded-2xl border border-white/10 flex items-center justify-center ${item.color} group-hover:bg-primary-500 group-hover:text-white transition-all duration-500`}>
+                  <item.icon size={28} />
+                </div>
+                <div>
+                  <h3 className="text-xl font-black text-white font-display tracking-tight">{item.title}</h3>
+                  <p className="text-gray-400 font-medium text-sm">{item.desc}</p>
+                </div>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* 3. CATEGORIES SECTION */}
-      <section className="py-24 bg-gray-50/50">
-        <div className="container-custom">
-          <div className="flex justify-between items-end mb-12">
-            <div>
-              <span className="text-primary-600 font-bold tracking-wider uppercase text-xs mb-2 block">
-                Shop By Category
-              </span>
-              <h2 className="text-3xl md:text-4xl font-bold font-display text-gray-900">
-                Essentials for You
-              </h2>
+      {/* 7. NEWSLETTER */}
+      <section className="py-24 bg-white">
+         <div className="container-custom">
+            <div className="relative rounded-[4rem] overflow-hidden bg-primary-600 p-8 md:p-20 text-center text-white shadow-2xl">
+               <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+               <div className="relative z-10 max-w-2xl mx-auto">
+                  <h2 className="text-4xl md:text-6xl font-black mb-6 font-display leading-tight">Join Agrawal Family</h2>
+                  <p className="text-primary-100 text-lg mb-10">Get ₹200 off your first order & weekly fresh harvest updates.</p>
+                  <form className="flex flex-col sm:flex-row gap-4 max-w-lg mx-auto bg-white/10 backdrop-blur-md p-2 rounded-[2.5rem] border border-white/20 shadow-inner">
+                     <input 
+                        type="email" 
+                        placeholder="Your email address" 
+                        className="flex-1 bg-transparent px-8 py-4 outline-none placeholder:text-white/60 font-medium"
+                     />
+                     <button className="bg-white text-primary-700 px-8 py-4 rounded-full font-black text-xs uppercase tracking-widest hover:bg-gray-100 transition-all active:scale-95 shadow-lg">Subscribe</button>
+                  </form>
+               </div>
             </div>
-            <Link
-              to="/categories"
-              className="hidden md:flex text-primary-600 font-bold hover:gap-2 gap-1 items-center transition-all"
-            >
-              View All <ArrowRight size={18} />
-            </Link>
-          </div>
-
-          {catLoading ? (
-            <div className="flex justify-center p-20">
-              <div className="w-10 h-10 border-4 border-primary-500 border-t-transparent rounded-full animate-spin" />
-            </div>
-          ) : (
-            <div className="category-grid">
-              {(categories || []).map((category) => (
-                <CategoryCard key={category._id} category={category} />
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* 4. CURATED COLLECTIONS (MOSAIC) */}
-      <section className="py-12">
-        <div className="container-custom">
-          <h2 className="text-3xl font-bold font-display text-gray-900 mb-10 text-center">
-            Curated for your Lifestyle
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-[600px] md:h-[500px]">
-            {/* Large Card */}
-            <div className="md:col-span-2 relative rounded-[2rem] overflow-hidden group cursor-pointer shadow-lg">
-              <img
-                src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=2574"
-                alt="Healthy"
-                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-              <div className="absolute bottom-0 left-0 p-8 text-white">
-                <span className="bg-primary-500 text-white text-xs font-bold px-3 py-1 rounded-full mb-3 inline-block">
-                  Healthy Living
-                </span>
-                <h3 className="text-3xl font-bold mb-2">Organic & Fresh</h3>
-                <p className="text-gray-200 mb-4 line-clamp-2">
-                  Direct from farms to your table. Experience the taste of pure
-                  nature.
-                </p>
-                <Link
-                  to="/category/fruits-vegetables"
-                  className="text-white border-b-2 border-white/30 pb-1 hover:border-white transition-all"
-                >
-                  Shop Collection
-                </Link>
-              </div>
-            </div>
-
-            {/* Right Column Stack */}
-            <div className="grid grid-rows-2 gap-6">
-              <div className="relative rounded-[2rem] overflow-hidden group cursor-pointer shadow-lg bg-orange-100">
-                <img
-                  src="https://images.unsplash.com/photo-1621939514649-280e2ee25f60?auto=format&fit=crop&q=80&w=2670"
-                  alt="Snacks"
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 mix-blend-multiply opacity-90"
-                />
-                <div className="absolute bottom-0 left-0 p-6">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-1">
-                    Snack Attack
-                  </h3>
-                  <p className="text-gray-700 text-sm">
-                    Munchies for your movie night.
-                  </p>
-                </div>
-              </div>
-              <div className="relative rounded-[2rem] overflow-hidden group cursor-pointer shadow-lg bg-blue-100">
-                <img
-                  src="https://images.unsplash.com/photo-1563805042-7684c019e1cb?auto=format&fit=crop&q=80&w=2727"
-                  alt="Beverages"
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 mix-blend-multiply opacity-90"
-                />
-                <div className="absolute bottom-0 left-0 p-6">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-1">
-                    Cool Drinks
-                  </h3>
-                  <p className="text-gray-700 text-sm">
-                    Beat the heat with chilled juices.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 5. FEATURED PRODUCTS */}
-      <section className="py-24 bg-white relative">
-        <div className="container-custom">
-          <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-4">
-            <div className="max-w-2xl">
-              <span className="text-primary-600 font-bold tracking-wider uppercase text-xs mb-2 block">
-                Weekly Best Sellers
-              </span>
-              <h2 className="text-3xl md:text-4xl font-bold font-display text-gray-900">
-                Trending Near You
-              </h2>
-            </div>
-            <Link to="/products" className="btn btn-outline rounded-full">
-              Explore All
-            </Link>
-          </div>
-
-          {featLoading ? (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              {[1, 2, 3, 4].map((i) => (
-                <div
-                  key={i}
-                  className="h-96 bg-gray-100 rounded-3xl animate-pulse"
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="product-grid">
-              {(featuredProducts || []).length > 0 ? (
-                (featuredProducts || []).map((product) => (
-                  <ProductCard key={product._id} product={product} />
-                ))
-              ) : (
-                <div className="col-span-full py-12 text-center text-gray-500">
-                  No products found
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* 6. APP DOWNLOAD SECTION (Dark Contrast) */}
-      <section className="py-24 bg-[#0F1F18] relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
-        <div className="container-custom relative z-10">
-          <div className="grid md:grid-cols-2 gap-16 items-center">
-            <div>
-              <span className="inline-block py-1 px-3 rounded-lg bg-green-500/20 text-green-400 text-xs font-bold mb-6 border border-green-500/30">
-                COMING SOON
-              </span>
-              <h2 className="text-4xl md:text-6xl font-bold text-white mb-6 font-display leading-tight">
-                Shop smarter with <br /> the{" "}
-                <span className="text-primary-500">Agrawal App</span>
-              </h2>
-              <p className="text-gray-400 text-lg mb-10 leading-relaxed">
-                Get exclusive app-only discounts, track your orders in
-                real-time, and get personalized recommendations.
-              </p>
-              <div className="flex flex-wrap gap-4">
-                <button className="bg-white text-gray-900 px-6 py-3 rounded-xl font-bold flex items-center gap-3 hover:bg-gray-100 transition-colors">
-                  <Smartphone size={24} />
-                  <div className="text-left">
-                    <div className="text-[10px] uppercase font-bold text-gray-500">
-                      Download on
-                    </div>
-                    <div className="text-sm font-bold leading-none">
-                      App Store
-                    </div>
-                  </div>
-                </button>
-                <button className="bg-transparent border border-gray-600 text-white px-6 py-3 rounded-xl font-bold flex items-center gap-3 hover:bg-white/5 transition-colors">
-                  <div className="text-left">
-                    <div className="text-[10px] uppercase font-bold text-gray-400">
-                      Get it on
-                    </div>
-                    <div className="text-sm font-bold leading-none">
-                      Google Play
-                    </div>
-                  </div>
-                </button>
-              </div>
-            </div>
-            <div className="relative">
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary-500/20 rounded-full blur-3xl"></div>
-              <img
-                src="https://cdni.iconscout.com/illustration/premium/thumb/online-grocery-shopping-app-3560667-2984024.png"
-                alt="Mobile App"
-                className="relative z-10 w-full max-w-lg mx-auto drop-shadow-2xl animate-float"
-              />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 7. WHY CHOOSE US STRIP */}
-      <section className="py-20 bg-primary-50/50">
-        <div className="container-custom">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center divide-y md:divide-y-0 md:divide-x divide-gray-200">
-            <div className="px-4 py-4">
-              <div className="w-16 h-16 bg-white rounded-2xl shadow-sm text-primary-500 flex items-center justify-center mx-auto mb-6 rotate-3 hover:rotate-6 transition-transform">
-                <Clock size={32} />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">
-                10 Minute Delivery
-              </h3>
-              <p className="text-gray-500 text-sm px-8">
-                We deliver your daily needs faster than you can get ready.
-              </p>
-            </div>
-            <div className="px-4 py-4">
-              <div className="w-16 h-16 bg-white rounded-2xl shadow-sm text-primary-500 flex items-center justify-center mx-auto mb-6 -rotate-3 hover:-rotate-6 transition-transform">
-                <Shield size={32} />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">
-                Best Quality Guarantee
-              </h3>
-              <p className="text-gray-500 text-sm px-8">
-                If you don't like it, we take it back. No questions asked.
-              </p>
-            </div>
-            <div className="px-4 py-4">
-              <div className="w-16 h-16 bg-white rounded-2xl shadow-sm text-primary-500 flex items-center justify-center mx-auto mb-6 rotate-3 hover:rotate-6 transition-transform">
-                <Zap size={32} />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">
-                Exclusive Offers
-              </h3>
-              <p className="text-gray-500 text-sm px-8">
-                Get the best prices on top brands every single day.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 8. NEWSLETTER BANNER */}
-      <section className="py-24 container-custom">
-        <div className="relative rounded-[2.5rem] overflow-hidden bg-primary-600 shadow-2xl shadow-primary-900/20 px-8 py-16 md:p-20 text-center">
-          <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
-          <div className="absolute -top-24 -right-24 w-96 h-96 bg-primary-400/30 rounded-full blur-3xl"></div>
-          <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-primary-800/30 rounded-full blur-3xl"></div>
-
-          <div className="relative z-10 max-w-3xl mx-auto">
-            <h2 className="text-3xl md:text-5xl font-bold mb-6 font-display text-white">
-              Get ₹200 off your first order
-            </h2>
-            <p className="text-primary-100 text-lg mb-10">
-              Join our newsletter and get exclusive coupons, recipe ideas, and
-              more delivered to your inbox.
-            </p>
-            <form className="flex flex-col sm:flex-row gap-4 max-w-lg mx-auto">
-              <input
-                type="email"
-                placeholder="Enter your email address"
-                className="flex-1 bg-white/10 backdrop-blur-md border border-white/20 rounded-full px-6 py-4 text-white placeholder-white/60 focus:outline-none focus:bg-white/20 transition-all font-medium"
-              />
-              <button className="bg-white text-primary-700 px-8 py-4 rounded-full font-bold shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300">
-                Subscribe
-              </button>
-            </form>
-          </div>
-        </div>
+         </div>
       </section>
     </div>
   );

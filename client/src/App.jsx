@@ -22,6 +22,7 @@ import OrderSuccess from "./pages/public/OrderSuccess";
 import CategoryPage from "./pages/public/CategoryPage";
 import About from "./pages/public/About";
 import Contact from "./pages/public/Contact";
+import Categories from "./pages/public/Categories";
 
 // Admin Pages
 import AdminDashboard from "./admin/pages/Dashboard";
@@ -62,6 +63,7 @@ function App() {
                   <Route path="/register" element={<Register />} />
                   <Route path="/products" element={<ProductList />} />
                   <Route path="/product/:slug" element={<ProductDetails />} />
+                  <Route path="/categories" element={<Categories />} />
                   <Route path="/category/:slug" element={<CategoryPage />} />
                   <Route
                     path="/category/:slug/:subSlug"
