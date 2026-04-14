@@ -166,12 +166,7 @@ const Header = () => {
                                     </div>
                                 </button>
                                 <div className="absolute top-full right-0 mt-2 w-56 bg-white rounded-[2rem] shadow-2xl border border-gray-100 p-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all transform translate-y-4 group-hover:translate-y-0 z-[120]">
-                                    {isAdmin && (
-                                        <Link to="/admin/dashboard" className="flex items-center gap-3 px-4 py-3 text-sm font-bold text-gray-700 hover:bg-gray-50 rounded-2xl mb-1">
-                                            <div className="w-8 h-8 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center font-black">A</div>
-                                            Admin Panel
-                                        </Link>
-                                    )}
+                                    <div className="border-b border-gray-100 my-2" />
                                     <button onClick={logout} className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-red-600 hover:bg-red-50 rounded-2xl">
                                         <div className="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center"><LogOut size={16} /></div>
                                         Logout

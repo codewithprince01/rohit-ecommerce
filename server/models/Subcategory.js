@@ -9,10 +9,7 @@ const subcategorySchema = new mongoose.Schema({
   slug: {
     type: String,
     required: true,
-    lowercase: true
-  },
-  description: {
-    type: String,
+    lowercase: true,
     trim: true
   },
   category: {
@@ -27,26 +24,27 @@ const subcategorySchema = new mongoose.Schema({
   isActive: {
     type: Boolean,
     default: true
-  },
-  order: {
-    type: Number,
-    default: 0
   }
 }, {
   timestamps: true
 });
 
-// Create slug from name before saving
+// Pre-save middleware to generate slug
 subcategorySchema.pre('save', function(next) {
-  if (this.isModified('name')) {
-    this.slug = this.name.toLowerCase().replace(/\s+/g, '-').replace(/[^\w\-]+/g, '');
+  if (this.isModified('name') && !this.slug) {
+    this.slug = this.name
+      .toLowerCase()
+      .replace(/\s+/g, '-')
+      .replace(/[^\w\-]+/g, '')
+      .replace(/\-\-+/g, '-')
+      .replace(/^-+/, '')
+      .replace(/-+$/, '');
   }
   next();
 });
 
 // Compound index for unique subcategory per category
 subcategorySchema.index({ name: 1, category: 1 }, { unique: true });
-subcategorySchema.index({ name: 'text', description: 'text' });
 
 const Subcategory = mongoose.model('Subcategory', subcategorySchema);
 

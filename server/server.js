@@ -30,6 +30,8 @@ import customerRoutes from './routes/customerRoutes.js';
 import supplierRoutes from './routes/supplierRoutes.js';
 import reportRoutes from './routes/reportRoutes.js';
 import adminUserRoutes from './routes/adminUserRoutes.js';
+import subcategoryRoutes from './routes/subcategoryRoutes.js';
+import subSubCategoryRoutes from './routes/subSubCategoryRoutes.js';
 
 dotenv.config();
 
@@ -118,6 +120,8 @@ app.use('/api/customers', customerRoutes);
 app.use('/api/suppliers', supplierRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/admin/users', adminUserRoutes);
+app.use('/api/subcategories', subcategoryRoutes);
+app.use('/api/subsubcategories', subSubCategoryRoutes);
 
 // Also expose them under /api/v1 for API versioning
 app.use('/api/v1/auth', authRoutes);

@@ -26,7 +26,7 @@ const ProductCard = ({ product }) => {
         : 0;
 
     const getProductImage = () => {
-        const img = product.images?.[0] || product.thumbnail;
+        const img = product.image || product.images?.[0] || product.thumbnail;
         if (!img) return 'https://dummyimage.com/600x600/f3f4f6/9ca3af.png&text=' + encodeURIComponent(product.name);
         
         const path = typeof img === 'string' ? img : img.url;

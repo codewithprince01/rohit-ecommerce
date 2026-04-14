@@ -79,19 +79,35 @@ const ProductDetails = () => {
             />
 
             <div className="container-custom py-8">
-                {/* Breadcrumb */}
-                <nav className="flex items-center text-sm text-gray-500 mb-8 overflow-x-auto whitespace-nowrap pb-2">
+                {/* Dynamic Breadcrumbs */}
+                <nav className="flex items-center text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-10 overflow-x-auto whitespace-nowrap pb-2 no-scrollbar">
                     <Link to="/" className="hover:text-primary-600 transition-colors">Home</Link>
-                    <ChevronRight size={14} className="mx-2 text-gray-300" />
-                    <Link to="/products" className="hover:text-primary-600 transition-colors">Products</Link>
-                    <ChevronRight size={14} className="mx-2 text-gray-300" />
+                    <ChevronRight size={10} className="mx-3 text-gray-200" />
+                    <Link to="/products" className="hover:text-primary-600 transition-colors">Shop</Link>
+                    
                     {product.category && (
                         <>
+                            <ChevronRight size={10} className="mx-3 text-gray-200" />
                             <Link to={`/category/${product.category.slug}`} className="hover:text-primary-600 transition-colors">{product.category.name}</Link>
-                            <ChevronRight size={14} className="mx-2 text-gray-300" />
                         </>
                     )}
-                    <span className="text-gray-900 font-semibold">{product.name}</span>
+
+                    {product.subCategory && (
+                        <>
+                            <ChevronRight size={10} className="mx-3 text-gray-200" />
+                            <Link to={`/category/${product.category?.slug}/${product.subCategory.slug}`} className="hover:text-primary-600 transition-colors">{product.subCategory.name}</Link>
+                        </>
+                    )}
+
+                    {product.subSubCategory && (
+                        <>
+                            <ChevronRight size={10} className="mx-3 text-gray-200" />
+                            <span className="text-gray-400">{product.subSubCategory.name}</span>
+                        </>
+                    )}
+
+                    <ChevronRight size={10} className="mx-3 text-gray-200" />
+                    <span className="text-primary-600">{product.name}</span>
                 </nav>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">

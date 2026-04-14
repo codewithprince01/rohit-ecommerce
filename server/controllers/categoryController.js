@@ -1,84 +1,61 @@
 import Category from '../models/Category.js';
 import Subcategory from '../models/Subcategory.js';
 import SubSubCategory from '../models/SubSubCategory.js';
+import Product from '../models/Product.js';
 import fs from 'fs';
 import path from 'path';
 
 // Helper to delete image
 const removeImage = (imagePath) => {
-    if(!imagePath) return;
+    if (!imagePath) return;
     const fullPath = path.join(process.cwd(), imagePath);
-    if(fs.existsSync(fullPath)) {
+    if (fs.existsSync(fullPath)) {
         fs.unlinkSync(fullPath);
     }
 }
 
-// @desc    Create a category
-// @route   POST /api/categories
-// @access  Private/Admin
-export const createCategory = async (req, res) => {
-    try {
-        const { name, description, parent, priority, isActive } = req.body;
-        const image = req.file ? req.file.path.replace(/\\/g, '/') : null;
-
-        const category = await Category.create({
-            name,
-            description,
-            image,
-            parent: parent || null,
-            priority: priority || 0,
-            isActive: isActive !== undefined ? isActive : true
-        });
-
-        res.status(201).json({ success: true, data: category });
-    } catch (error) {
-         if (req.file) removeImage(req.file.path);
-         res.status(400).json({ success: false, message: error.message });
-    }
-};
-
-// @desc    Get all categories (Main level or all depending on query)
+// @desc    Get all categories
 // @route   GET /api/categories
 // @access  Public
 export const getCategories = async (req, res) => {
     try {
-        // If the frontend fetches the tree, it expects the hierarchy
         let query = {};
         if (req.query.includeInactive === 'false') {
             query.isActive = true;
         }
-
-        // We fetch flat categories if requested
-        const categories = await Category.find(query).sort('order priority name');
+        const categories = await Category.find(query).sort('name');
         res.json({ success: true, count: categories.length, data: categories });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
 };
 
-// @desc    Get full hierarchy (Infinite Nesting)
+// @desc    Get full hierarchy (Category -> Subcategory -> SubSubCategory)
 // @route   GET /api/categories/hierarchy
 // @access  Public
 export const getHierarchy = async (req, res) => {
     try {
-        // Retrieve the deeply nested hierarchy using the existing static method in Category.js
-        const tree = await Category.getTree();
-        res.json({ success: true, data: tree });
-    } catch (error) {
-         res.status(500).json({ success: false, message: error.message });
-    }
-};
+        // Fetch all categories and populate subcategories
+        const categories = await Category.find({ isActive: true }).lean();
+        
+        const hierarchy = await Promise.all(categories.map(async (cat) => {
+            const subcategories = await Subcategory.find({ category: cat._id, isActive: true }).lean();
+            
+            const nestedSubcategories = await Promise.all(subcategories.map(async (sub) => {
+                const subSubCategories = await SubSubCategory.find({ subcategory: sub._id, isActive: true }).lean();
+                
+                const nestedSubSubCategories = await Promise.all(subSubCategories.map(async (ssub) => {
+                    const products = await Product.find({ subSubCategory: ssub._id, isActive: true }).limit(10).lean();
+                    return { ...ssub, products };
+                }));
 
-// @desc    Get single category by ID
-// @route   GET /api/categories/:id
-// @access  Public
-export const getCategory = async (req, res) => {
-    try {
-        const category = await Category.findById(req.params.id);
-        if (!category) {
-            return res.status(404).json({ success: false, message: 'Category not found' });
-        }
-        res.json({ success: true, data: category });
+                return { ...sub, subSubCategories: nestedSubSubCategories };
+            }));
+
+            return { ...cat, subcategories: nestedSubSubCategories };
+        }));
+
+        res.json({ success: true, data: hierarchy });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
@@ -99,65 +76,68 @@ export const getCategoryBySlug = async (req, res) => {
     }
 };
 
-// @desc    Update category
-// @route   PUT /api/categories/:id
-// @access  Private/Admin
+// @desc    Get subcategories of a category
+// @route   GET /api/categories/:id/subcategories
+// @access  Public
+export const getSubcategories = async (req, res) => {
+    try {
+        const subcategories = await Subcategory.find({ category: req.params.id }).sort('name');
+        res.json({ success: true, count: subcategories.length, data: subcategories });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+// @desc    Admin: Create a category
+export const createCategory = async (req, res) => {
+    try {
+        const { name, isActive } = req.body;
+        const image = req.file ? req.file.path.replace(/\\/g, '/') : null;
+        const category = await Category.create({ name, image, isActive: isActive !== undefined ? isActive : true });
+        res.status(201).json({ success: true, data: category });
+    } catch (error) {
+        if (req.file) removeImage(req.file.path);
+        res.status(400).json({ success: false, message: error.message });
+    }
+};
+
+// @desc    Admin: Update category
 export const updateCategory = async (req, res) => {
     try {
         let category = await Category.findById(req.params.id);
-        if (!category) {
-            return res.status(404).json({ success: false, message: 'Category not found' });
-        }
-
-        const { name, description, parent, isActive, priority } = req.body;
-        let image = category.image;
-
+        if (!category) return res.status(404).json({ success: false, message: 'Category not found' });
+        const { name, isActive } = req.body;
         if (req.file) {
             removeImage(category.image);
-            image = req.file.path.replace(/\\/g, '/');
+            category.image = req.file.path.replace(/\\/g, '/');
         }
-
         category.name = name || category.name;
-        category.description = description || category.description;
-        category.image = image;
-        if (parent !== undefined) category.parent = parent || null;
-        if(isActive !== undefined) category.isActive = isActive;
-        if(priority !== undefined) category.priority = priority;
-
+        if (isActive !== undefined) category.isActive = isActive;
         await category.save();
-
         res.json({ success: true, data: category });
     } catch (error) {
         res.status(400).json({ success: false, message: error.message });
     }
 };
 
-// @desc    Delete category
-// @route   DELETE /api/categories/:id
-// @access  Private/Admin
+// @desc    Admin: Delete category
 export const deleteCategory = async (req, res) => {
     try {
         const category = await Category.findById(req.params.id);
-        if (!category) {
-            return res.status(404).json({ success: false, message: 'Category not found' });
-        }
-
+        if (!category) return res.status(404).json({ success: false, message: 'Category not found' });
         removeImage(category.image);
         await category.deleteOne();
-
         res.json({ success: true, message: 'Category removed' });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
 };
 
-// @desc    Get subcategories of a category
-// @route   GET /api/categories/:id/subcategories
-// @access  Public
-export const getSubcategories = async (req, res) => {
+export const getCategory = async (req, res) => {
     try {
-        const subcategories = await Category.find({ parent: req.params.id }).sort('name');
-        res.json({ success: true, count: subcategories.length, data: subcategories });
+        const category = await Category.findById(req.params.id);
+        if (!category) return res.status(404).json({ success: false, message: 'Category not found' });
+        res.json({ success: true, data: category });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }

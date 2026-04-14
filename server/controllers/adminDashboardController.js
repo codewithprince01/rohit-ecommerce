@@ -12,9 +12,6 @@ import asyncHandler from '../middleware/asyncHandler.js';
 export const getDashboardOverview = asyncHandler(async (req, res) => {
   const today = new Date();
   const startOfToday = new Date(today.setHours(0, 0, 0, 0));
-  const startOfWeek = new Date(today.setDate(today.getDate() - today.getDay()));
-  const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-  const startOfYear = new Date(today.getFullYear(), 0, 1);
 
   // Parallel queries for performance
   const [
@@ -235,8 +232,45 @@ export const getSalesAnalytics = asyncHandler(async (req, res) => {
     {
       $group: {
         _id: '$productDetails.category',
-        categoryName: { $first: '$categoryDetails.name' },
-        totalSold: { $sum: '$items.quantity' },
+        name: { $first: '$categoryDetails.name' },
+        revenue: { $sum: '$items.subtotal' }
+      }
+    },
+    { $sort: { revenue: -1 } },
+    { $limit: 10 }
+  ]);
+
+  // Subcategory-wise sales (The new logic for 3rd level)
+  const subcategorySales = await Order.aggregate([
+    {
+      $match: {
+        createdAt: { $gte: startDate, $lte: endDate },
+        status: { $ne: ORDER_STATUS.CANCELLED }
+      }
+    },
+    { $unwind: '$items' },
+    {
+      $lookup: {
+        from: 'products',
+        localField: 'items.product',
+        foreignField: '_id',
+        as: 'productDetails'
+      }
+    },
+    { $unwind: '$productDetails' },
+    {
+      $lookup: {
+        from: 'subcategories',
+        localField: 'productDetails.subCategory',
+        foreignField: '_id',
+        as: 'subCategoryDetails'
+      }
+    },
+    { $unwind: { path: '$subCategoryDetails', preserveNullAndEmptyArrays: true } },
+    {
+      $group: {
+        _id: '$productDetails.subCategory',
+        name: { $first: '$subCategoryDetails.name' },
         revenue: { $sum: '$items.subtotal' }
       }
     },
@@ -283,6 +317,7 @@ export const getSalesAnalytics = asyncHandler(async (req, res) => {
       endDate,
       salesData,
       categorySales,
+      subcategorySales,
       orderStatusDistribution,
       paymentMethodDistribution
     }

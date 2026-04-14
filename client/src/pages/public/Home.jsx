@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import {
   ArrowRight,
@@ -12,7 +12,7 @@ import {
   CheckCircle2,
   Zap,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import ProductCard from "../../components/common/ProductCard";
 import CategoryCard from "../../components/common/CategoryCard";
 import { useFetch } from "../../hooks/useFetch";
@@ -40,6 +40,8 @@ const Home = () => {
   const { data: featuredProducts = [], loading: featLoading } = useFetch(() =>
     productService.getFeatured(8),
   );
+  const navigate = useNavigate();
+  const [isExpanded, setIsExpanded] = useState(false);
   const heroRef = useRef(null);
   const { scrollYProgress } = useScroll({
     target: heroRef,
@@ -199,7 +201,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* 2. CIRCLE CATEGORY GRID (Zepto/Blinkit Style) */}
+      {/* 2. CIRCLE CATEGORY GRID (Dynamic) */}
       <section className="py-12 bg-white">
         <div className="container-custom">
            <div className="flex items-center justify-between mb-8">
@@ -207,24 +209,42 @@ const Home = () => {
               <Link to="/categories" className="text-primary-600 font-bold text-sm flex items-center gap-1 hover:gap-2 transition-all">View All <ArrowRight size={16} /></Link>
            </div>
            
-           <div className="grid grid-cols-4 md:grid-cols-8 lg:grid-cols-10 gap-x-4 gap-y-8">
-              {(categories || []).slice(0, 10).map((category) => (
-                <div 
-                   key={category._id} 
-                   onClick={() => navigate(`/category/${category.slug}`)}
-                   className="flex flex-col items-center gap-3 cursor-pointer group"
-                >
-                   <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-gray-50 flex items-center justify-center p-3 border-2 border-transparent group-hover:border-primary-500 group-hover:bg-primary-50 transition-all shadow-sm">
-                      <img 
-                        src={category.image ? `${import.meta.env.VITE_API_URL.replace('/api', '')}/${category.image.startsWith('/') ? category.image.slice(1) : category.image}` : `https://ui-avatars.com/api/?name=${category.name}&background=f3f4f6&color=2fab73`}
-                        className="w-full h-full object-contain mix-blend-multiply group-hover:scale-110 transition-all"
-                        alt={category.name}
-                      />
-                   </div>
-                   <span className="text-[10px] md:text-xs font-bold text-gray-700 text-center group-hover:text-primary-600 truncate w-full px-1">{category.name}</span>
+            <div className="flex flex-col gap-10">
+              <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-10 gap-x-3 gap-y-10">
+                {(isExpanded ? (categories || []) : (categories?.slice(0, 10) || [])).map((category) => {
+                  return (
+                    <div 
+                      key={category._id} 
+                      onClick={() => navigate(`/category/${category.slug}`)}
+                      className="flex flex-col items-center gap-3 cursor-pointer group"
+                    >
+                      <div className="w-20 h-20 md:w-24 md:h-24 rounded-[2rem] bg-gray-50 flex items-center justify-center p-4 border-2 border-transparent group-hover:border-primary-500/30 group-hover:shadow-[0_20px_40px_-10px_rgba(47,171,115,0.2)] transition-all duration-500 relative overflow-hidden">
+                        <img 
+                          src={category.image || 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=200&q=80'}
+                          className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500 drop-shadow-sm"
+                          alt={category.name}
+                        />
+                        <div className="absolute inset-0 bg-white/40 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </div>
+                      <span className="text-[10px] md:text-[11px] font-black text-gray-600 text-center leading-tight group-hover:text-primary-600 transition-colors uppercase tracking-tight w-full px-1">
+                        {category.name}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {!isExpanded && categories?.length > 10 && (
+                <div className="flex justify-center mt-4">
+                  <button 
+                    onClick={() => setIsExpanded(true)}
+                    className="flex items-center gap-2 px-10 py-5 bg-gray-950 text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.3em] hover:bg-primary-600 transition-all shadow-xl hover:-translate-y-1"
+                  >
+                    Discover All Departments <ArrowRight size={14} />
+                  </button>
                 </div>
-              ))}
-           </div>
+              )}
+            </div>
         </div>
       </section>
 
