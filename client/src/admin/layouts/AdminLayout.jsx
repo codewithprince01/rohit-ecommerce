@@ -24,6 +24,18 @@ import {
   FileText,
   Shield,
   HelpCircle,
+  Star,
+  Image as ImageIcon,
+  Mail,
+  MapPin,
+  Palette,
+  Receipt,
+  Store,
+  Repeat,
+  Bike,
+  Clock,
+  RotateCcw,
+  BellRing,
 } from "lucide-react";
 
 const AdminLayout = () => {
@@ -31,7 +43,9 @@ const AdminLayout = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(true);
   const [isSidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [isDarkMode, setDarkMode] = useState(() => {
-    return localStorage.getItem('admin-theme') === 'dark';
+    // Default to dark mode unless explicitly set to light
+    const savedTheme = localStorage.getItem('admin-theme');
+    return savedTheme !== 'light';
   });
   const [showNotifications, setShowNotifications] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -49,7 +63,6 @@ const AdminLayout = () => {
     }
   }, [isDarkMode]);
 
-  // Menu items organized by sections
   const menuSections = [
     {
       title: "Overview",
@@ -68,33 +81,50 @@ const AdminLayout = () => {
       items: [
         { path: "/admin/products", icon: ShoppingBag, label: "Products" },
         { path: "/admin/categories", icon: Layers, label: "Categories" },
+        { path: "/admin/brands", icon: Store, label: "Brands" },
         {
           path: "/admin/inventory",
           icon: Package,
           label: "Inventory",
           badge: "3",
         },
+        { path: "/admin/reviews", icon: Star, label: "Reviews" },
       ],
     },
     {
       title: "Sales",
       items: [
         { path: "/admin/orders", icon: Truck, label: "Orders" },
+        { path: "/admin/subscriptions", icon: Repeat, label: "Subscriptions" },
         { path: "/admin/customers", icon: Users, label: "Customers" },
         { path: "/admin/coupons", icon: Tag, label: "Coupons & Offers" },
       ],
     },
     {
-      title: "Operations",
+      title: "Marketing",
       items: [
+        { path: "/admin/banners", icon: ImageIcon, label: "Banners" },
+        { path: "/admin/push-notifications", icon: BellRing, label: "Push Notifications" },
+        { path: "/admin/newsletters", icon: Mail, label: "Newsletters" },
+      ],
+    },
+    {
+      title: "Operations & Logistics",
+      items: [
+        { path: "/admin/delivery-slots", icon: Clock, label: "Delivery Slots" },
+        { path: "/admin/fleet", icon: Bike, label: "Delivery Fleet" },
+        { path: "/admin/returns", icon: RotateCcw, label: "Returns & Refunds" },
         { path: "/admin/suppliers", icon: Warehouse, label: "Suppliers" },
+        { path: "/admin/shipping", icon: MapPin, label: "Shipping & Zones" },
         { path: "/admin/reports", icon: FileText, label: "Reports" },
       ],
     },
     {
       title: "Settings",
       items: [
+        { path: "/admin/appearance", icon: Palette, label: "Appearance" },
         { path: "/admin/settings", icon: Settings, label: "Store Settings" },
+        { path: "/admin/taxes", icon: Receipt, label: "Taxes & Duties" },
         { path: "/admin/users", icon: Shield, label: "Admin Users" },
         { path: "/admin/messages", icon: MessageSquare, label: "Messages" },
       ],
@@ -159,16 +189,16 @@ const AdminLayout = () => {
           {/* Logo */}
           <div className="h-16 flex items-center justify-between px-4 border-b border-gray-200 dark:border-gray-700">
             <Link to="/admin/dashboard" className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center shadow-lg shadow-primary-500/30">
-                <span className="text-white font-bold text-xl">A</span>
+              <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-lg leading-none">A</span>
               </div>
               {!isSidebarCollapsed && (
                 <div className="flex flex-col">
-                  <span className="text-lg font-bold text-gray-900 dark:text-white">
+                  <span className="text-base font-bold text-gray-900 dark:text-white leading-tight">
                     Agrawal
                   </span>
-                  <span className="text-[10px] text-primary-600 font-semibold tracking-widest uppercase">
-                    Admin Panel
+                  <span className="text-[10px] text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wider">
+                    Store Admin
                   </span>
                 </div>
               )}
@@ -187,12 +217,12 @@ const AdminLayout = () => {
               <div className="relative">
                 <Search
                   className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                  size={18}
+                  size={16}
                 />
                 <input
                   type="text"
                   placeholder="Search..."
-                  className="w-full pl-10 pr-4 py-2.5 bg-gray-100 dark:bg-gray-700 border-0 rounded-xl text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:ring-2 focus:ring-primary-500 focus:bg-white dark:focus:bg-gray-600 transition-all outline-none"
+                  className="w-full pl-9 pr-4 py-2 bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-lg text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:ring-1 focus:ring-primary-500 focus:border-primary-500 transition-all outline-none"
                 />
               </div>
             </div>
@@ -203,11 +233,11 @@ const AdminLayout = () => {
             {menuSections.map((section, idx) => (
               <div key={section.title} className={idx > 0 ? "mt-6" : ""}>
                 {!isSidebarCollapsed && (
-                  <h3 className="px-4 mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                  <h3 className="px-3 mb-2 text-[11px] font-bold text-gray-400 uppercase tracking-wider">
                     {section.title}
                   </h3>
                 )}
-                <div className="space-y-1">
+                <div className="space-y-0.5">
                   {section.items.map((item) => {
                     const Icon = item.icon;
                     const isActive =
@@ -218,32 +248,32 @@ const AdminLayout = () => {
                       <Link
                         key={item.path}
                         to={item.path}
-                        className={`group flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 ${
+                        className={`group flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-150 ${
                           isActive
-                            ? "bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg shadow-primary-500/30"
-                            : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                            ? "bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-400 font-semibold"
+                            : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800/50 hover:text-gray-900 dark:hover:text-white font-medium"
                         }`}
                         title={isSidebarCollapsed ? item.label : ""}
                       >
                         <Icon
-                          size={20}
+                          size={18}
                           className={
                             isActive
-                              ? "text-white"
-                              : "text-gray-500 dark:text-gray-400 group-hover:text-primary-600"
+                              ? "text-primary-600 dark:text-primary-400"
+                              : "text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300"
                           }
                         />
                         {!isSidebarCollapsed && (
                           <>
-                            <span className="font-medium flex-1">
+                            <span className="flex-1 text-sm">
                               {item.label}
                             </span>
                             {item.badge && (
                               <span
-                                className={`text-xs px-2 py-0.5 rounded-full font-semibold ${
+                                className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold ${
                                   isActive
-                                    ? "bg-white/20 text-white"
-                                    : "bg-primary-50 text-primary-600"
+                                    ? "bg-primary-100 text-primary-700 dark:bg-primary-800 dark:text-primary-200"
+                                    : "bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400"
                                 }`}
                               >
                                 {item.badge}
@@ -264,7 +294,7 @@ const AdminLayout = () => {
             <div
               className={`flex items-center ${isSidebarCollapsed ? "justify-center" : "gap-3"}`}
             >
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center text-white font-bold shadow-lg">
+              <div className="w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-primary-600 dark:text-primary-400 font-bold text-sm">
                 {user?.name?.charAt(0)?.toUpperCase() || "A"}
               </div>
               {!isSidebarCollapsed && (
@@ -281,10 +311,10 @@ const AdminLayout = () => {
             {!isSidebarCollapsed && (
               <button
                 onClick={handleLogout}
-                className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/40 rounded-xl transition-colors font-medium text-sm"
+                className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2 text-gray-600 hover:text-red-600 hover:bg-red-50 dark:text-gray-400 dark:hover:text-red-400 dark:hover:bg-red-900/20 rounded-lg transition-colors font-medium text-sm border border-transparent hover:border-red-100 dark:hover:border-red-900/30"
               >
-                <LogOut size={18} />
-                <span>Logout</span>
+                <LogOut size={16} />
+                <span>Sign Out</span>
               </button>
             )}
           </div>

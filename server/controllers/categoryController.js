@@ -4,6 +4,7 @@ import SubSubCategory from '../models/SubSubCategory.js';
 import Product from '../models/Product.js';
 import fs from 'fs';
 import path from 'path';
+import slugify from 'slugify';
 
 // Helper to delete image
 const removeImage = (imagePath) => {
@@ -52,7 +53,7 @@ export const getHierarchy = async (req, res) => {
                 return { ...sub, subSubCategories: nestedSubSubCategories };
             }));
 
-            return { ...cat, subcategories: nestedSubSubCategories };
+            return { ...cat, subcategories: nestedSubcategories };
         }));
 
         res.json({ success: true, data: hierarchy });
@@ -93,7 +94,8 @@ export const createCategory = async (req, res) => {
     try {
         const { name, isActive } = req.body;
         const image = req.file ? req.file.path.replace(/\\/g, '/') : null;
-        const category = await Category.create({ name, image, isActive: isActive !== undefined ? isActive : true });
+        const slug = slugify(name, { lower: true, strict: true }) + '-' + Date.now();
+        const category = await Category.create({ name, slug, image, isActive: isActive !== undefined ? isActive : true });
         res.status(201).json({ success: true, data: category });
     } catch (error) {
         if (req.file) removeImage(req.file.path);
@@ -111,7 +113,10 @@ export const updateCategory = async (req, res) => {
             removeImage(category.image);
             category.image = req.file.path.replace(/\\/g, '/');
         }
-        category.name = name || category.name;
+        if (name && name !== category.name) {
+            category.name = name;
+            category.slug = slugify(name, { lower: true, strict: true }) + '-' + Date.now();
+        }
         if (isActive !== undefined) category.isActive = isActive;
         await category.save();
         res.json({ success: true, data: category });

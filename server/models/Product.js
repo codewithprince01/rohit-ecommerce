@@ -12,8 +12,17 @@ const productSchema = new mongoose.Schema({
     unique: true,
     lowercase: true,
   },
+  sku: {
+    type: String,
+    trim: true,
+  },
   description: {
     type: String,
+    trim: true,
+  },
+  unit: {
+    type: String,
+    required: [true, 'Product unit is required'],
     trim: true,
   },
   price: {
@@ -21,9 +30,13 @@ const productSchema = new mongoose.Schema({
     required: true,
     min: 0,
   },
-  image: {
-    type: String,
-    default: null,
+  comparePrice: {
+    type: Number,
+    min: 0,
+  },
+  images: {
+    type: [String],
+    default: [],
   },
   category: {
     type: mongoose.Schema.Types.ObjectId,
@@ -42,6 +55,10 @@ const productSchema = new mongoose.Schema({
     type: Number,
     default: 0,
     min: [0, 'Stock cannot be negative'],
+  },
+  lowStockThreshold: {
+    type: Number,
+    default: 10,
   },
   isActive: {
     type: Boolean,

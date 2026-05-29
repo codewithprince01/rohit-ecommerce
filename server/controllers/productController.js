@@ -4,6 +4,7 @@ import Subcategory from '../models/Subcategory.js';
 import SubSubCategory from '../models/SubSubCategory.js';
 import fs from 'fs';
 import path from 'path';
+import slugify from 'slugify';
 
 // Helper to delete image
 const removeImage = (imagePath) => {
@@ -19,15 +20,23 @@ const removeImage = (imagePath) => {
 // @access  Public
 export const getProducts = async (req, res) => {
     try {
-        const { category, subCategory, subSubCategory, search, sort, page = 1, limit = 10 } = req.query;
-        let query = { isActive: true };
+        const { category, subCategory, subSubCategory, search, sort, page = 1, limit = 10, isActive, all } = req.query;
+        
+        let query = {};
+        
+        // Handle Active/Inactive filter
+        if (isActive !== undefined) {
+            query.isActive = isActive === 'true';
+        } else if (all !== 'true') {
+            query.isActive = true; // Storefront default
+        }
 
         if (category) query.category = category;
         if (subCategory) query.subCategory = subCategory;
         if (subSubCategory) query.subSubCategory = subSubCategory;
 
         if (search) {
-            query.$text = { $search: search };
+            query.name = { $regex: search, $options: 'i' };
         }
 
         let sortQuery = '-createdAt';
@@ -93,24 +102,38 @@ export const getFeaturedProducts = async (req, res) => {
 // @desc    Admin: Create product
 export const createProduct = async (req, res) => {
     try {
-        const { name, price, description, category, subCategory, subSubCategory, stock, isActive } = req.body;
-        const image = req.file ? req.file.path.replace(/\\/g, '/') : null;
+        const { name, price, comparePrice, description, category, subCategory, subSubCategory, stock, unit, sku, lowStockThreshold, isActive } = req.body;
+        
+        let productImages = [];
+        if (req.files && req.files.length > 0) {
+            productImages = req.files.map(file => file.path.replace(/\\/g, '/'));
+        } else if (req.file) {
+            productImages = [req.file.path.replace(/\\/g, '/')];
+        }
+
+        const slug = slugify(name, { lower: true, strict: true }) + '-' + Date.now();
 
         const product = await Product.create({
             name,
+            slug,
+            sku,
             price,
+            comparePrice,
             description,
+            unit,
             category,
             subCategory,
             subSubCategory,
-            image,
+            images: productImages,
             stock: stock || 0,
+            lowStockThreshold: lowStockThreshold || 10,
             isActive: isActive !== undefined ? isActive : true
         });
 
         res.status(201).json({ success: true, data: product });
     } catch (error) {
-        if (req.file) removeImage(req.file.path);
+        if (req.files && req.files.length > 0) req.files.forEach(f => removeImage(f.path));
+        else if (req.file) removeImage(req.file.path);
         res.status(400).json({ success: false, message: error.message });
     }
 };
@@ -121,21 +144,32 @@ export const updateProduct = async (req, res) => {
         let product = await Product.findById(req.params.id);
         if (!product) return res.status(404).json({ success: false, message: 'Product not found' });
 
-        const { name, price, description, category, subCategory, subSubCategory, stock, isActive } = req.body;
+        const { name, price, comparePrice, description, category, subCategory, subSubCategory, stock, unit, sku, lowStockThreshold, isActive } = req.body;
 
-        if (req.file) {
-            removeImage(product.image);
-            product.image = req.file.path.replace(/\\/g, '/');
+        if (req.files && req.files.length > 0) {
+            const newImages = req.files.map(file => file.path.replace(/\\/g, '/'));
+            product.images = [...(product.images || []), ...newImages];
+        } else if (req.file) {
+            const newImage = req.file.path.replace(/\\/g, '/');
+            product.images = [...(product.images || []), newImage];
         }
 
-        product.name = name || product.name;
-        product.price = price || product.price;
-        product.description = description || product.description;
+        if (name && name !== product.name) {
+            product.name = name;
+            product.slug = slugify(name, { lower: true, strict: true }) + '-' + Date.now();
+        }
+
+        product.price = price !== undefined ? price : product.price;
+        product.comparePrice = comparePrice !== undefined ? comparePrice : product.comparePrice;
+        product.description = description !== undefined ? description : product.description;
+        product.unit = unit !== undefined ? unit : product.unit;
+        product.sku = sku !== undefined ? sku : product.sku;
+        product.lowStockThreshold = lowStockThreshold !== undefined ? lowStockThreshold : product.lowStockThreshold;
         product.category = category || product.category;
         product.subCategory = subCategory || product.subCategory;
         product.subSubCategory = subSubCategory || product.subSubCategory;
         product.stock = stock !== undefined ? stock : product.stock;
-        product.isActive = isActive !== undefined ? isActive : product.isActive;
+        product.isActive = isActive !== undefined ? (isActive === 'true' || isActive === true) : product.isActive;
 
         await product.save();
         res.json({ success: true, data: product });
@@ -149,7 +183,11 @@ export const deleteProduct = async (req, res) => {
     try {
         const product = await Product.findById(req.params.id);
         if (!product) return res.status(404).json({ success: false, message: 'Product not found' });
-        removeImage(product.image);
+        
+        if (product.images && product.images.length > 0) {
+            product.images.forEach(img => removeImage(img));
+        }
+        
         await product.deleteOne();
         res.json({ success: true, message: 'Product removed' });
     } catch (error) {
@@ -213,8 +251,11 @@ export const deleteProductImage = async (req, res) => {
         const { imagePath } = req.body;
         const product = await Product.findById(req.params.id);
         if (!product) return res.status(404).json({ success: false, message: 'Product not found' });
-        product.image = null;
+        
+        // Remove image from array
+        product.images = (product.images || []).filter(img => img !== imagePath);
         await product.save();
+        
         removeImage(imagePath);
         res.json({ success: true, data: product });
     } catch (error) {

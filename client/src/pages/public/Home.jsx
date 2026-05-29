@@ -17,6 +17,7 @@ import ProductCard from "../../components/common/ProductCard";
 import CategoryCard from "../../components/common/CategoryCard";
 import { useFetch } from "../../hooks/useFetch";
 import { productService, categoryService } from "../../services";
+import { getImageUrl } from "../../services/api";
 import Head from "../../components/common/Head";
 
 // Brand Logos (Using placeholder text for now, or icons)
@@ -210,23 +211,23 @@ const Home = () => {
            </div>
            
             <div className="flex flex-col gap-10">
-              <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-10 gap-x-3 gap-y-10">
-                {(isExpanded ? (categories || []) : (categories?.slice(0, 10) || [])).map((category) => {
+              <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-x-6 gap-y-12">
+                {(isExpanded ? (categories || []) : (categories?.slice(0, 8) || [])).map((category) => {
                   return (
                     <div 
                       key={category._id} 
                       onClick={() => navigate(`/category/${category.slug}`)}
-                      className="flex flex-col items-center gap-3 cursor-pointer group"
+                      className="flex flex-col items-center gap-4 cursor-pointer group"
                     >
-                      <div className="w-20 h-20 md:w-24 md:h-24 rounded-[2rem] bg-gray-50 flex items-center justify-center p-4 border-2 border-transparent group-hover:border-primary-500/30 group-hover:shadow-[0_20px_40px_-10px_rgba(47,171,115,0.2)] transition-all duration-500 relative overflow-hidden">
+                      <div className="w-24 h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 rounded-full bg-gray-50 flex items-center justify-center p-0 border-2 border-transparent group-hover:border-primary-500/30 group-hover:shadow-[0_20px_40px_-10px_rgba(47,171,115,0.2)] transition-all duration-500 relative overflow-hidden shadow-sm">
                         <img 
-                          src={category.image || 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=200&q=80'}
-                          className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500 drop-shadow-sm"
+                          src={getImageUrl(category.image) || 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=200&q=80'}
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 drop-shadow-sm"
                           alt={category.name}
                         />
-                        <div className="absolute inset-0 bg-white/40 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
                       </div>
-                      <span className="text-[10px] md:text-[11px] font-black text-gray-600 text-center leading-tight group-hover:text-primary-600 transition-colors uppercase tracking-tight w-full px-1">
+                      <span className="text-xs md:text-sm font-black text-gray-950 text-center leading-tight group-hover:text-primary-600 transition-colors uppercase tracking-tight w-full px-1">
                         {category.name}
                       </span>
                     </div>

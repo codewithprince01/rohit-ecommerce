@@ -87,17 +87,13 @@ export const categoryService = {
 
   // Admin: Create category
   create: async (categoryData) => {
-    const response = await api.post('/categories', categoryData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
-    });
+    const response = await api.post('/categories', categoryData);
     return response.data;
   },
 
   // Admin: Update category
   update: async (id, categoryData) => {
-    const response = await api.put(`/categories/${id}`, categoryData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
-    });
+    const response = await api.put(`/categories/${id}`, categoryData);
     return response.data;
   },
 
@@ -157,17 +153,13 @@ export const productService = {
 
   // Admin: Create product
   create: async (productData) => {
-    const response = await api.post('/products', productData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
-    });
+    const response = await api.post('/products', productData);
     return response.data;
   },
 
   // Admin: Update product
   update: async (id, productData) => {
-    const response = await api.put(`/products/${id}`, productData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
-    });
+    const response = await api.put(`/products/${id}`, productData);
     return response.data;
   },
 
@@ -245,9 +237,7 @@ export const settingsService = {
 
   // Admin: Update settings
   update: async (settingsData) => {
-    const response = await api.put('/settings', settingsData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
-    });
+    const response = await api.put('/settings', settingsData);
     return response.data;
   },
 };

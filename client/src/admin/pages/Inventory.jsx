@@ -100,12 +100,13 @@ const Inventory = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [stockFilter, setStockFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
   const [totalProducts, setTotalProducts] = useState(0);
   const [adjustmentModal, setAdjustmentModal] = useState({ isOpen: false, product: null });
   const [stats, setStats] = useState({ totalProducts: 0, lowStock: 0, outOfStock: 0 });
 
-  useEffect(() => { fetchInventory(); fetchStats(); }, [currentPage, searchQuery, stockFilter]);
+  useEffect(() => { fetchInventory(); fetchStats(); }, [currentPage, searchQuery, stockFilter, itemsPerPage]);
 
   const fetchStats = async () => {
     try {
@@ -117,7 +118,7 @@ const Inventory = () => {
   const fetchInventory = async () => {
     try {
       setLoading(true);
-      const params = new URLSearchParams({ page: currentPage, limit: 12 });
+      const params = new URLSearchParams({ page: currentPage, limit: itemsPerPage });
       if (searchQuery) params.append("search", searchQuery);
       if (stockFilter === "low") params.append("lowStock", "true");
       if (stockFilter === "out") params.append("outOfStock", "true");
@@ -143,7 +144,7 @@ const Inventory = () => {
       render: (product) => (
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 border rounded bg-white overflow-hidden flex-shrink-0">
-             <img src={getImageUrl(product.images?.[0] || product.thumbnail)} alt="" className="w-full h-full object-cover" />
+             <img src={getImageUrl(product.images?.[0] || product.image || product.thumbnail)} alt="" className="w-full h-full object-cover" />
           </div>
           <div className="min-w-0">
             <p className="text-sm font-bold text-gray-900 dark:text-white truncate">{product.name}</p>
@@ -215,8 +216,21 @@ const Inventory = () => {
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
         <DataTable columns={columns} data={products} loading={loading} emptyMessage="No products found in inventory." />
         {totalProducts > 0 && (
-          <div className="px-6 py-4 border-t border-gray-100">
-            <Pagination currentPage={currentPage} totalPages={totalPages} totalItems={totalProducts} itemsPerPage={12} onPageChange={setCurrentPage} />
+          <div className="px-6 py-4 border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 flex flex-col sm:flex-row justify-between items-center gap-4">
+             <div className="flex items-center gap-2">
+                <label className="text-sm text-gray-600 dark:text-gray-400">Rows per page:</label>
+                <select 
+                    value={itemsPerPage} 
+                    onChange={(e) => { setItemsPerPage(Number(e.target.value)); setCurrentPage(1); }}
+                    className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-lg text-sm px-2 py-1 outline-none focus:border-primary-500"
+                >
+                    <option value={10}>10</option>
+                    <option value={20}>20</option>
+                    <option value={50}>50</option>
+                    <option value={100}>100</option>
+                </select>
+            </div>
+            <Pagination currentPage={currentPage} totalPages={totalPages} totalItems={totalProducts} itemsPerPage={itemsPerPage} onPageChange={setCurrentPage} />
           </div>
         )}
       </div>

@@ -1,194 +1,86 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
+import asyncHandler from './asyncHandler.js';
 
-export const protect = async (req, res, next) => {
-    let token;
+// Protect routes - verify JWT token
+export const protect = asyncHandler(async (req, res, next) => {
+  let token;
 
-    if (
-        req.headers.authorization &&
-        req.headers.authorization.startsWith('Bearer')
-    ) {
-        token = req.headers.authorization.split(' ')[1];
+  // Check for token in Authorization header (Bearer token)
+  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+    token = req.headers.authorization.split(' ')[1];
+  }
+
+  // Check if token exists
+  if (!token) {
+    return res.status(401).json({ success: false, message: 'Not authorized, no token' });
+  }
+
+  try {
+    // Verify token
+    const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
+
+    // Get user from token
+    req.user = await User.findById(decoded.id);
+
+    if (!req.user) {
+      return res.status(401).json({ success: false, message: 'User not found' });
     }
 
-    if (!token) {
-        return res.status(401).json({
-            success: false,
-            message: 'Access token required'
-        });
+    if (!req.user.isActive) {
+      return res.status(401).json({ success: false, message: 'User account is inactive' });
     }
 
+    next();
+  } catch (error) {
+    return res.status(401).json({ success: false, message: 'Not authorized, token failed' });
+  }
+});
+
+// Admin middleware - check if user is admin level
+export const admin = asyncHandler(async (req, res, next) => {
+  if (req.user && req.user.isAdminLevel()) {
+    next();
+  } else {
+    res.status(403).json({ success: false, message: 'Not authorized as admin' });
+  }
+});
+
+// Optional: Check specific role
+export const authorize = (...roles) => {
+  return asyncHandler(async (req, res, next) => {
+    if (!req.user) {
+      return res.status(401).json({ success: false, message: 'Not authenticated' });
+    }
+
+    if (!roles.includes(req.user.role)) {
+      return res.status(403).json({ 
+        success: false, 
+        message: `User role ${req.user.role} is not authorized to access this route` 
+      });
+    }
+
+    next();
+  });
+};
+
+// Optional auth - doesn't require token but adds user if token exists
+export const optionalAuth = asyncHandler(async (req, res, next) => {
+  let token;
+
+  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+    token = req.headers.authorization.split(' ')[1];
+  }
+
+  if (token) {
     try {
-        // Verify access token
-        const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
-        
-        // Find user
-        const user = await User.findById(decoded.id).select('-password');
-        
-        if (!user) {
-            return res.status(401).json({
-                success: false,
-                message: 'User not found'
-            });
-        }
-
-        // Check if user is active
-        if (!user.isActive) {
-            return res.status(401).json({
-                success: false,
-                message: 'Account is deactivated'
-            });
-        }
-
-        // Check if password changed after token was issued
-        if (user.changedPasswordAfter(decoded.iat)) {
-            return res.status(401).json({
-                success: false,
-                message: 'Password changed recently, please login again'
-            });
-        }
-
-        req.user = user;
-        next();
+      const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
+      req.user = await User.findById(decoded.id);
     } catch (error) {
-        if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError' || error.name === 'NotBeforeError') {
-            return res.status(401).json({
-                success: false,
-                message: 'Your session has expired or is invalid. Please login again.'
-            });
-        }
-        
-        // Handle Mongoose cast errors in token IDs
-        if (error.name === 'CastError') {
-            return res.status(401).json({
-                success: false,
-                message: 'Invalid session data. Please login again.'
-            });
-        }
-
-        console.error('Auth middleware error:', error);
-        return res.status(401).json({
-            success: false,
-            message: `Authentication failed: ${error.message}`
-        });
+      // Token invalid, but we continue without user
+      console.log('Optional auth: invalid token');
     }
-};
+  }
 
-export const authorize = (...permissions) => {
-    return (req, res, next) => {
-        if (!req.user) {
-            return res.status(401).json({
-                success: false,
-                message: 'Authentication required'
-            });
-        }
-
-        // Check if user has required permissions
-        const hasPermission = permissions.every(permission => 
-            req.user.permissions.includes(permission)
-        );
-
-        if (!hasPermission) {
-            return res.status(403).json({
-                success: false,
-                message: 'Insufficient permissions',
-                required: permissions
-            });
-        }
-
-        next();
-    };
-};
-
-export const admin = (req, res, next) => {
-    if (!req.user) {
-        return res.status(401).json({
-            success: false,
-            message: 'Authentication required'
-        });
-    }
-
-    if (!req.user.isAdminLevel()) {
-        return res.status(403).json({
-            success: false,
-            message: 'Admin access required'
-        });
-    }
-
-    next();
-};
-
-export const superAdmin = (req, res, next) => {
-    if (!req.user) {
-        return res.status(401).json({
-            success: false,
-            message: 'Authentication required'
-        });
-    }
-
-    if (req.user.role !== 'super_admin') {
-        return res.status(403).json({
-            success: false,
-            message: 'Super admin access required'
-        });
-    }
-
-    next();
-};
-
-// Optional auth - doesn't fail if no token, just continues without user
-export const optionalAuth = async (req, res, next) => {
-    let token;
-
-    if (
-        req.headers.authorization &&
-        req.headers.authorization.startsWith('Bearer')
-    ) {
-        token = req.headers.authorization.split(' ')[1];
-    }
-
-    if (token) {
-        try {
-            const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
-            const user = await User.findById(decoded.id).select('-password');
-            
-            if (user && user.isActive && !user.changedPasswordAfter(decoded.iat)) {
-                req.user = user;
-            }
-        } catch (error) {
-            // Token invalid, continue without user
-            req.user = null;
-        }
-    }
-
-    next();
-};
-
-// Check if user owns resource or is admin
-export const ownerOrAdmin = (resourceField = 'userId') => {
-    return (req, res, next) => {
-        if (!req.user) {
-            return res.status(401).json({
-                success: false,
-                message: 'Authentication required'
-            });
-        }
-
-        // If user is admin, allow access
-        if (req.user.isAdminLevel()) {
-            return next();
-        }
-
-        // Check if user owns the resource
-        const resourceUserId = req.params[resourceField] || req.body[resourceField];
-        
-        if (req.user._id.toString() !== resourceUserId) {
-            return res.status(403).json({
-                success: false,
-                message: 'Access denied: You can only access your own resources'
-            });
-        }
-
-        next();
-    };
-};
+  next();
+});

@@ -1,5 +1,6 @@
 import SubSubCategory from '../models/SubSubCategory.js';
 import Product from '../models/Product.js';
+import slugify from 'slugify';
 
 // @desc    Get all sub-subcategories (Brands)
 export const getSubSubCategories = async (req, res) => {
@@ -26,8 +27,10 @@ export const getSubSubCategoryBySlug = async (req, res) => {
 export const createSubSubCategory = async (req, res) => {
     try {
         const { name, subcategory, isActive } = req.body;
+        const slug = slugify(name, { lower: true, strict: true }) + '-' + Date.now();
         const subSubCategory = await SubSubCategory.create({ 
             name, 
+            slug,
             subcategory, 
             isActive: isActive !== undefined ? isActive : true 
         });
@@ -44,7 +47,10 @@ export const updateSubSubCategory = async (req, res) => {
         if (!subSubCategory) return res.status(404).json({ success: false, message: 'Sub-subcategory not found' });
 
         const { name, subcategory, isActive } = req.body;
-        subSubCategory.name = name || subSubCategory.name;
+        if (name && name !== subSubCategory.name) {
+            subSubCategory.name = name;
+            subSubCategory.slug = slugify(name, { lower: true, strict: true }) + '-' + Date.now();
+        }
         subSubCategory.subcategory = subcategory || subSubCategory.subcategory;
         if (isActive !== undefined) subSubCategory.isActive = isActive;
 

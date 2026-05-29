@@ -30,6 +30,7 @@ import AdminAnalytics from "./admin/pages/Analytics";
 import AdminProducts from "./admin/pages/Products";
 import ProductForm from "./admin/pages/ProductForm";
 import AdminCategories from "./admin/pages/Categories";
+import AdminBrands from "./admin/pages/Brands";
 import AdminOrders from "./admin/pages/Orders";
 import AdminInventory from "./admin/pages/Inventory";
 import AdminCustomers from "./admin/pages/Customers";
@@ -93,6 +94,7 @@ function App() {
                     <Route path="products/edit/:id" element={<ProductForm />} />
                     <Route path="products/:id" element={<ProductForm />} />
                     <Route path="categories" element={<AdminCategories />} />
+                    <Route path="brands" element={<AdminBrands />} />
                     <Route path="inventory" element={<AdminInventory />} />
                     <Route path="orders" element={<AdminOrders />} />
                     <Route path="customers" element={<AdminCustomers />} />

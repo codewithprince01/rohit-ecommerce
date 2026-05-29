@@ -13,23 +13,29 @@ const createAdminUser = async () => {
         await connectDB();
         
         // Check if admin already exists
-        const existingAdmin = await User.findOne({ email: 'admin@grocery.com' });
+        let adminUser = await User.findOne({ email: 'rohit@gmail.com' });
         
-        if (existingAdmin) {
+        if (adminUser) {
             console.log('⚠️  Admin user already exists!');
+            
+            // Force update password if needed
+            adminUser.password = 'Rohit@1234';
+            adminUser.role = 'admin';
+            await adminUser.save();
+            
             console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-            console.log('📧 Email: admin@grocery.com');
-            console.log('🔑 Password: Admin@123');
+            console.log('📧 Email: rohit@gmail.com');
+            console.log('🔑 Password: Rohit@1234');
             console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
             await mongoose.connection.close();
             process.exit(0);
         }
 
         // Create admin user
-        const adminUser = await User.create({
-            name: 'Admin User',
-            email: 'admin@grocery.com',
-            password: 'Admin@123',
+        adminUser = await User.create({
+            name: 'Rohit Admin',
+            email: 'rohit@gmail.com',
+            password: 'Rohit@1234',
             phone: '9999999999',
             role: 'admin',
             isActive: true,
@@ -38,11 +44,11 @@ const createAdminUser = async () => {
 
         console.log('✅ Admin user created successfully!');
         console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        console.log('📧 Email: admin@grocery.com');
-        console.log('🔑 Password: Admin@123');
+        console.log('📧 Email: rohit@gmail.com');
+        console.log('🔑 Password: Rohit@1234');
         console.log('👤 Role: admin');
         console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        console.log('\n🚀 You can now login at: http://localhost:5173/login');
+        console.log('\n🚀 You can now login at: http://localhost:5173/admin/login');
         
         await mongoose.connection.close();
         process.exit(0);

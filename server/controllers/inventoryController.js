@@ -14,7 +14,7 @@ export const getInventory = asyncHandler(async (req, res) => {
 // @access  Private/Admin
 export const adjustStock = asyncHandler(async (req, res) => {
     const { productId } = req.params;
-    const result = await inventoryService.adjustStock(productId, req.body, req.user._id);
+    const result = await inventoryService.adjustStock(productId, req.body, req.user);
     res.json({
         success: true,
         message: 'Stock updated successfully',
@@ -65,7 +65,7 @@ export const bulkUpdateStock = asyncHandler(async (req, res) => {
         res.status(400);
         throw new Error('Updates array is required');
     }
-    const results = await inventoryService.bulkUpdate(updates, req.user._id);
+    const results = await inventoryService.bulkUpdate(updates, req.user);
     res.json({ success: true, results });
 });
 

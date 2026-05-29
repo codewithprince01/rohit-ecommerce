@@ -36,11 +36,10 @@ export const getDashboardOverview = asyncHandler(async (req, res) => {
     Product.countDocuments(),
     Product.countDocuments({ isActive: true }),
     Product.countDocuments({ 
-      trackInventory: true, 
-      $expr: { $lte: ['$stock', '$lowStockThreshold'] },
+      $expr: { $lte: ['$stock', { $ifNull: ['$lowStockThreshold', 10] }] },
       stock: { $gt: 0 }
     }),
-    Product.countDocuments({ trackInventory: true, stock: 0 }),
+    Product.countDocuments({ stock: 0 }),
     
     // Orders stats
     Order.countDocuments(),
@@ -331,12 +330,12 @@ export const getSalesAnalytics = asyncHandler(async (req, res) => {
  */
 export const getLowStockAlerts = asyncHandler(async (req, res) => {
   const lowStockProducts = await Product.find({
-    trackInventory: true,
-    $expr: { $lte: ['$stock', '$lowStockThreshold'] }
+    $expr: { $lte: ['$stock', { $ifNull: ['$lowStockThreshold', 10] }] },
+    stock: { $gt: 0 }
   })
     .sort({ stock: 1 })
     .limit(50)
-    .select('name sku stock lowStockThreshold thumbnail category')
+    .select('name sku stock lowStockThreshold images category')
     .populate('category', 'name')
     .lean();
 

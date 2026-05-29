@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import api from "../utils/api";
-import ProductCard from "../components/ProductCard";
+import ProductCard from "../components/common/ProductCard";
 import BestSellingCategories from "../components/BestSellingCategories";
 
 const Home = () => {
-  const [categories, setCategories] = useState([]);
   const [featuredProducts, setFeaturedProducts] = useState([]);
+  const [snacks, setSnacks] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -15,20 +15,16 @@ const Home = () => {
 
   const fetchData = async () => {
     try {
-      const [categoriesRes, productsRes] = await Promise.all([
-        api.get("/categories").catch(() => ({ data: { data: [] } })),
-        api
-          .get("/products?featured=true&limit=8")
-          .catch(() => ({ data: { data: [] } })),
-      ]);
-      setCategories(categoriesRes.data?.data || categoriesRes.data || []);
-      setFeaturedProducts(
-        productsRes.data?.data || productsRes.data?.products || [],
-      );
+      // Fetch featured products (general)
+      const productsRes = await api.get("/products?featured=true&limit=6").catch(() => ({ data: { data: [] } }));
+      
+      // Attempt to fetch another specific category, like snacks or cold drinks. We'll use the same for demo if none exists.
+      const snacksRes = await api.get("/products?limit=6").catch(() => ({ data: { data: [] } }));
+
+      setFeaturedProducts(productsRes.data?.data || productsRes.data?.products || []);
+      setSnacks(snacksRes.data?.data || snacksRes.data?.products || []);
     } catch (error) {
       console.error("Error fetching data:", error);
-      setCategories([]);
-      setFeaturedProducts([]);
     } finally {
       setLoading(false);
     }
@@ -36,163 +32,96 @@ const Home = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="w-10 h-10 border-4 border-primary-100 border-t-primary-600 rounded-full animate-spin"></div>
       </div>
     );
   }
 
   return (
-    <div>
-      {/* Hero Section */}
-      <section className="bg-linear-to-r from-primary-600 to-primary-700 text-white py-20">
-        <div className="container-custom">
-          <div className="max-w-2xl">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              Fresh Groceries Delivered to Your Door
-            </h1>
-            <p className="text-lg mb-8 text-primary-100">
-              Shop from our wide selection of fresh fruits, vegetables, dairy,
-              and more.
-            </p>
-            <Link
-              to="/products"
-              className="btn bg-white text-primary-600 hover:bg-gray-100"
-            >
-              Shop Now
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Best Selling Categories Section */}
-      <BestSellingCategories />
-
-      {/* Categories Section */}
-      <section className="py-16 bg-gray-50">
-        <div className="container-custom">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8">
-            Shop by Category
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {(categories || []).map((category) => (
-              <Link
-                key={category._id}
-                to={`/category/${category.slug}`}
-                className="card hover:shadow-lg transition-shadow duration-200 p-6 text-center"
-              >
-                {category.image && (
-                  <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-primary-100 flex items-center justify-center overflow-hidden">
-                    <img
-                      src={category.image 
-                        ? (category.image.startsWith('http') 
-                            ? category.image 
-                            : `${import.meta.env.VITE_API_URL.replace('/api', '')}/${category.image}`)
-                        : `https://via.placeholder.com/400x400?text=${encodeURIComponent(category.name)}`
-                      }
-                      alt={category.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                )}
-                <h3 className="font-semibold text-gray-900">{category.name}</h3>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Featured Products */}
-      <section className="py-16">
-        <div className="container-custom">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-3xl font-bold text-gray-900">
-              Featured Products
-            </h2>
-            <Link
-              to="/products"
-              className="text-primary-600 hover:text-primary-700 font-medium"
-            >
-              View All →
-            </Link>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {(featuredProducts || []).map((product) => (
-              <ProductCard key={product._id} product={product} />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section className="py-16 bg-gray-50">
-        <div className="container-custom">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg
-                  className="w-8 h-8 text-primary-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Fresh Products</h3>
-              <p className="text-gray-600">
-                We source the freshest products daily
-              </p>
+    <div className="bg-gray-50 min-h-screen pb-20">
+      <div className="container-custom pt-4">
+        
+        {/* 1. TOP PROMO BANNER CAROUSEL */}
+        <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-4 no-scrollbar">
+            {/* Banner 1 */}
+            <div className="snap-center shrink-0 w-full sm:w-[80%] md:w-[60%] lg:w-[45%] h-36 md:h-48 bg-gradient-to-r from-blue-600 to-blue-400 rounded-xl md:rounded-2xl flex items-center p-6 relative overflow-hidden">
+                <div className="relative z-10 text-white w-2/3">
+                    <h3 className="text-xl md:text-3xl font-black mb-1">Mega Savings</h3>
+                    <p className="text-sm md:text-base font-medium opacity-90 mb-3">Up to 50% off on Groceries</p>
+                    <button className="bg-white text-blue-600 px-4 py-1.5 rounded text-xs font-bold">Shop Now</button>
+                </div>
+                <img src="https://dummyimage.com/200x200/ffffff/000000&text=Groceries" alt="Promo" className="absolute right-0 bottom-0 w-32 md:w-40 mix-blend-multiply opacity-50 translate-x-4 translate-y-4" />
             </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg
-                  className="w-8 h-8 text-primary-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Fast Delivery</h3>
-              <p className="text-gray-600">Quick delivery to your doorstep</p>
+            
+            {/* Banner 2 */}
+            <div className="snap-center shrink-0 w-full sm:w-[80%] md:w-[60%] lg:w-[45%] h-36 md:h-48 bg-gradient-to-r from-green-600 to-teal-500 rounded-xl md:rounded-2xl flex items-center p-6 relative overflow-hidden">
+                <div className="relative z-10 text-white w-2/3">
+                    <h3 className="text-xl md:text-3xl font-black mb-1">Farm Fresh</h3>
+                    <p className="text-sm md:text-base font-medium opacity-90 mb-3">Fresh Veggies everyday</p>
+                    <button className="bg-white text-green-700 px-4 py-1.5 rounded text-xs font-bold">Explore</button>
+                </div>
+                <img src="https://dummyimage.com/200x200/ffffff/000000&text=Veggies" alt="Promo" className="absolute right-0 bottom-0 w-32 md:w-40 mix-blend-multiply opacity-50 translate-x-4 translate-y-4" />
             </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg
-                  className="w-8 h-8 text-primary-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Best Prices</h3>
-              <p className="text-gray-600">Competitive prices on all items</p>
+
+            {/* Banner 3 */}
+            <div className="snap-center shrink-0 w-full sm:w-[80%] md:w-[60%] lg:w-[45%] h-36 md:h-48 bg-gradient-to-r from-orange-500 to-yellow-400 rounded-xl md:rounded-2xl flex items-center p-6 relative overflow-hidden">
+                <div className="relative z-10 text-white w-2/3">
+                    <h3 className="text-xl md:text-3xl font-black mb-1">Snack Time</h3>
+                    <p className="text-sm md:text-base font-medium opacity-90 mb-3">Craving something?</p>
+                    <button className="bg-white text-orange-600 px-4 py-1.5 rounded text-xs font-bold">Order</button>
+                </div>
+                <img src="https://dummyimage.com/200x200/ffffff/000000&text=Snacks" alt="Promo" className="absolute right-0 bottom-0 w-32 md:w-40 mix-blend-multiply opacity-50 translate-x-4 translate-y-4" />
             </div>
-          </div>
         </div>
-      </section>
+
+        {/* 2. CATEGORY GRID */}
+        <div className="mt-4 md:mt-8">
+            <BestSellingCategories />
+        </div>
+
+        {/* 3. ROW: FEATURED / BESTSELLERS */}
+        <div className="mt-8 md:mt-12">
+            <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg md:text-xl font-bold text-gray-900">Bestsellers Near You</h2>
+                <Link to="/products" className="text-primary-600 text-sm font-semibold hover:underline">See all</Link>
+            </div>
+            {/* Horizontal Scroll for Mobile, Grid for Desktop */}
+            <div className="flex overflow-x-auto gap-4 pb-4 no-scrollbar snap-x lg:grid lg:grid-cols-6 lg:overflow-visible">
+                {(featuredProducts || []).map((product) => (
+                    <div key={product._id} className="shrink-0 snap-start w-[140px] md:w-[160px] lg:w-auto">
+                        <ProductCard product={product} />
+                    </div>
+                ))}
+            </div>
+        </div>
+
+        {/* 4. MID-PAGE PROMO BANNER */}
+        <div className="mt-4 md:mt-8 bg-[#fdf4e9] border border-orange-100 rounded-xl md:rounded-2xl p-4 md:p-6 flex flex-row items-center justify-between">
+             <div>
+                <h3 className="text-lg md:text-2xl font-bold text-gray-900 mb-1">Dairy & Breakfast</h3>
+                <p className="text-xs md:text-sm text-gray-600 mb-3">Start your day right</p>
+                <Link to="/products" className="bg-orange-500 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-sm">View Items</Link>
+             </div>
+             <img src="https://dummyimage.com/150x150/fdf4e9/000000&text=Dairy" alt="Dairy" className="w-24 md:w-32 object-contain mix-blend-multiply" />
+        </div>
+
+        {/* 5. ROW: SNACKS & DRINKS */}
+        <div className="mt-8 md:mt-12">
+            <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg md:text-xl font-bold text-gray-900">Snacks & Munchies</h2>
+                <Link to="/products" className="text-primary-600 text-sm font-semibold hover:underline">See all</Link>
+            </div>
+            <div className="flex overflow-x-auto gap-4 pb-4 no-scrollbar snap-x lg:grid lg:grid-cols-6 lg:overflow-visible">
+                {(snacks || []).map((product) => (
+                    <div key={product._id} className="shrink-0 snap-start w-[140px] md:w-[160px] lg:w-auto">
+                        <ProductCard product={product} />
+                    </div>
+                ))}
+            </div>
+        </div>
+
+      </div>
     </div>
   );
 };

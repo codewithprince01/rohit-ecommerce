@@ -16,7 +16,11 @@ api.interceptors.request.use(
     // Look for token in session storage (matching utils/api.js)
     const token = sessionStorage.getItem('accessToken') || localStorage.getItem('token');
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+      if (config.headers && typeof config.headers.set === 'function') {
+        config.headers.set('Authorization', `Bearer ${token}`);
+      } else {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
     }
     return config;
   },
@@ -43,11 +47,17 @@ api.interceptors.response.use(
           withCredentials: true
         });
 
-        const { accessToken } = response.data.data;
-        sessionStorage.setItem('accessToken', accessToken);
+        // Backend returns `data: { token: '...' }`
+        const { token: newAccessToken } = response.data.data;
+        sessionStorage.setItem('accessToken', newAccessToken);
 
         // Retry original request
-        originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+        if (originalRequest.headers && typeof originalRequest.headers.set === 'function') {
+           originalRequest.headers.set('Authorization', `Bearer ${newAccessToken}`);
+        } else {
+           originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
+        }
+        
         return api(originalRequest);
       } catch (refreshError) {
         // Refresh failed, logout user

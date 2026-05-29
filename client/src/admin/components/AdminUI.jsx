@@ -77,7 +77,7 @@ export const StatusBadge = ({ status, size = "md" }) => {
 
     // Stock statuses
     in_stock: {
-      color: "bg-emerald-100 text-emerald-700 border-emerald-200",
+      color: "bg-emerald-100 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800",
       label: "In Stock",
     },
     low_stock: {
@@ -91,7 +91,7 @@ export const StatusBadge = ({ status, size = "md" }) => {
 
     // General
     active: {
-      color: "bg-emerald-100 text-emerald-700 border-emerald-200",
+      color: "bg-emerald-100 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800",
       label: "Active",
     },
     inactive: {

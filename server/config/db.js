@@ -1,13 +1,18 @@
 import mongoose from 'mongoose';
+import dns from 'dns';
 
 const connectDB = async () => {
     try {
-        console.log('Connecting to MongoDB Atlas...');
-        const conn = await mongoose.connect(process.env.MONGODB_URI);
-        console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
+        // Fix for querySrv ETIMEOUT: Force DNS to Google's public DNS
+        dns.setServers(['8.8.8.8', '8.8.4.4']);
+
+        const conn = await mongoose.connect(process.env.MONGODB_URI, {
+            family: 4, // Force IPv4 to avoid potential IPv6 DNS issues
+        });
+        console.log(`MongoDB Connected: ${conn.connection.host}`);
     } catch (error) {
-        console.error('❌ MongoDB Connection failed:', error.message);
-        console.log('Check your network connection and ensure your IP is whitelisted in Atlas.');
+        console.error(`Error: ${error.message}`);
+        process.exit(1);
     }
 };
 

@@ -426,7 +426,6 @@ supplierSchema.pre('save', function(next) {
 });
 
 // Indexes
-supplierSchema.index({ code: 1 });
 supplierSchema.index({ name: 'text' });
 supplierSchema.index({ type: 1 });
 supplierSchema.index({ isActive: 1, status: 1 });

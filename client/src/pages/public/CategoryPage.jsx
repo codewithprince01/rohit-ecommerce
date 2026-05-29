@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { categoryService, productService } from '../../services';
+import { getImageUrl } from '../../services/api';
 import ProductCard from '../../components/common/ProductCard';
 import Head from '../../components/common/Head';
 import { ChevronRight, Filter, Zap, LayoutGrid } from 'lucide-react';
@@ -147,7 +148,7 @@ const CategoryPage = () => {
                         
                         <div className="hidden lg:block w-48 h-48 rounded-[3rem] overflow-hidden bg-gray-50 border-4 border-white shadow-2xl relative group">
                             <img 
-                                src={category.image || 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=400&q=80'} 
+                                src={getImageUrl(category.image) || 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=400&q=80'} 
                                 className="w-full h-full object-contain p-4 group-hover:scale-110 transition-transform duration-700" 
                                 alt={category.name} 
                             />
@@ -195,10 +196,17 @@ const CategoryPage = () => {
                                         <Link 
                                             key={ssub._id} 
                                             to={`${location.pathname}?brand=${ssub.slug}`}
-                                            className={`px-4 py-8 rounded-2xl text-center transition-all border-2 flex flex-col items-center gap-3 ${subSubCategory?._id === ssub._id ? 'bg-white border-primary-500 shadow-xl' : 'bg-gray-50 border-transparent hover:bg-white hover:border-gray-200'}`}
+                                            className={`px-4 py-8 rounded-[2.5rem] text-center transition-all border-2 flex flex-col items-center gap-4 ${subSubCategory?._id === ssub._id ? 'bg-white border-primary-500 shadow-2xl' : 'bg-gray-50 border-transparent hover:bg-white hover:border-gray-200'}`}
                                         >
-                                            <div className="text-[10px] font-black uppercase tracking-widest text-gray-900">{ssub.name}</div>
-                                            <div className={`w-2 h-2 rounded-full ${subSubCategory?._id === ssub._id ? 'bg-primary-500 animate-pulse' : 'bg-gray-200'}`}></div>
+                                            <div className="w-20 h-20 rounded-full bg-white flex items-center justify-center p-0 overflow-hidden shadow-sm border border-gray-100">
+                                              <img 
+                                                src={getImageUrl(ssub.image) || `https://ui-avatars.com/api/?name=${encodeURIComponent(ssub.name)}&background=f9fafb&color=111827`} 
+                                                className="w-full h-full object-cover"
+                                                alt={ssub.name}
+                                              />
+                                            </div>
+                                            <div className="text-[10px] font-black uppercase tracking-widest text-gray-950 leading-tight">{ssub.name}</div>
+                                            <div className={`w-1.5 h-1.5 rounded-full ${subSubCategory?._id === ssub._id ? 'bg-primary-500 animate-pulse' : 'bg-gray-200'}`}></div>
                                         </Link>
                                     ))}
                                 </div>
